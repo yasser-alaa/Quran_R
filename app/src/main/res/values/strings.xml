@@ -1,3 +1,5 @@
 <resources>
     <string name="app_name">Quran</string>
+    <string name="record_voice">record voice for search</string>
+    <string name="no_audio_recorded">no audio recorded</string>
 </resources>
