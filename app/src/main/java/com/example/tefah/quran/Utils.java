@@ -15,7 +15,7 @@ import java.util.Locale;
  * Utility class for helper methods and static values
  */
 
-class Utilities {
+class Utils {
 
     public static String startRecording(MediaRecorder recorder, Context context) {
         String savedAudioPath = null;
@@ -82,4 +82,6 @@ class Utilities {
         player.release();
         player = null;
     }
+
+
 }
