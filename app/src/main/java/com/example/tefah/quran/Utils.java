@@ -30,9 +30,9 @@ class Utils {
             String timeStamp = new SimpleDateFormat("ddMMyyyy_HHmmss",
                     Locale.getDefault()).format(new Date());
             // Record to the external cache directory for visibility
-            String audioFileName = timeStamp + " audioNote.3gp";
-            File imageFile = new File(storageDir, audioFileName);
-            savedAudioPath = imageFile.getAbsolutePath();
+            String audioFileName = timeStamp + "audioNote.3gp";
+            File audioFile = new File(storageDir, audioFileName);
+            savedAudioPath = audioFile.getAbsolutePath();
 
             recorder.setAudioSource(MediaRecorder.AudioSource.MIC);
             recorder.setOutputFormat(MediaRecorder.OutputFormat.THREE_GPP);

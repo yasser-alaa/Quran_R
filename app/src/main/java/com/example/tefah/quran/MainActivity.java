@@ -9,11 +9,14 @@ import android.os.Bundle;
 import android.util.Log;
 import android.view.MotionEvent;
 import android.view.View;
+import android.webkit.MimeTypeMap;
 import android.widget.Toast;
 
 import com.ipaulpro.afilechooser.utils.FileUtils;
 
 import java.io.File;
+import java.net.URI;
+import java.net.URISyntaxException;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
@@ -67,14 +70,19 @@ public class MainActivity extends AppCompatActivity implements MediaPlayer.OnSee
 
     @OnClick(R.id.test_player)
     public void play(){
-        if (player != null){
-            onSeekComplete(player);
-        }
-        player = new MediaPlayer();
         if (audioPath != null)
-            Utils.startPlaying(player, audioPath, this);
+            uploadFile(Uri.parse(audioPath));
         else
             Toast.makeText(this, getString(R.string.no_audio_recorded), Toast.LENGTH_SHORT).show();
+
+//        if (player != null){
+//            onSeekComplete(player);
+//        }
+//        player = new MediaPlayer();
+//        if (audioPath != null)
+//            Utils.startPlaying(player, audioPath, this);
+//        else
+//            Toast.makeText(this, getString(R.string.no_audio_recorded), Toast.LENGTH_SHORT).show();
     }
     @Override
     public void onSeekComplete(MediaPlayer mediaPlayer) {
@@ -96,18 +104,23 @@ public class MainActivity extends AppCompatActivity implements MediaPlayer.OnSee
 
         // https://github.com/iPaulPro/aFileChooser/blob/master/aFileChooser/src/com/ipaulpro/afilechooser/utils/FileUtils.java
         // use the FileUtils to get the actual file by uri
-        File file = FileUtils.getFile(this, fileUri);
+//        File file = FileUtils.getFile(this, fileUri);
+
+        File file = new File(audioPath);
+
+
 
         // create RequestBody instance from file
         RequestBody requestFile =
                 RequestBody.create(
-                        MediaType.parse(getContentResolver().getType(fileUri)),
+                        MediaType.parse("audio/3gpp"),
                         file
                 );
 
+
         // MultipartBody.Part is used to send also the actual file name
         MultipartBody.Part body =
-                MultipartBody.Part.createFormData("picture", file.getName(), requestFile);
+                MultipartBody.Part.createFormData("audio", file.getName(), requestFile);
 
         // add another part within the multipart request
         String descriptionString = "hello, this is description speaking";
@@ -117,10 +130,13 @@ public class MainActivity extends AppCompatActivity implements MediaPlayer.OnSee
 
         // finally, execute the request
         Call<ResponseBody> call = service.upload(body);
+
+//        Call<ResponseBody> call = service.getHtml();
         call.enqueue(new Callback<ResponseBody>() {
             @Override
             public void onResponse(Call<ResponseBody> call,
                                    Response<ResponseBody> response) {
+//                Log.i("GET REQUEST", response.toString());
                 Log.v("Upload", "success");
             }
 
@@ -129,5 +145,13 @@ public class MainActivity extends AppCompatActivity implements MediaPlayer.OnSee
                 Log.e("Upload error:", t.getMessage());
             }
         });
+    }
+    public static String getMimeType(String url) {
+        String type = null;
+        String extension = MimeTypeMap.getFileExtensionFromUrl(url);
+        if (extension != null) {
+            type = MimeTypeMap.getSingleton().getMimeTypeFromExtension(extension);
+        }
+        return type;
     }
 }
