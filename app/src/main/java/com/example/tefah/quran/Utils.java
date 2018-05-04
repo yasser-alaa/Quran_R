@@ -1,6 +1,5 @@
 package com.example.tefah.quran;
 
-import android.content.Context;
 import android.media.MediaPlayer;
 import android.media.MediaRecorder;
 import android.os.Environment;
@@ -17,9 +16,14 @@ import java.util.Locale;
 
 class Utils {
 
-    public static String startRecording(MediaRecorder recorder, Context context) {
+    /**
+     * function to start the media recorder and use helper functions to make the
+     * directory to save the audio file that will be recorded
+     * @param recorder media recorder
+     * @return the path of the audio file
+     */
+    public static String startRecording(MediaRecorder recorder) {
         String savedAudioPath = null;
-
         File storageDir = mainStorageDir();
         boolean success = true;
         storageDir = new File(storageDir.getPath() + "/audio");
@@ -44,16 +48,24 @@ class Utils {
             } catch (IOException e) {
                 e.printStackTrace();
             }
+            try {
+                recorder.start();
+            }catch (IllegalStateException e){
+                e.printStackTrace();
+            }
 
-            recorder.start();
         }
         return savedAudioPath;
+
     }
 
     public static void stopRecording(MediaRecorder recorder) {
-        recorder.stop();
-        recorder.release();
-        recorder = null;
+        try {
+            recorder.stop();
+            recorder.release();
+        }catch (IllegalStateException e){
+            e.printStackTrace();
+        }
     }
 
     private static File mainStorageDir(){
@@ -82,6 +94,5 @@ class Utils {
         player.release();
         player = null;
     }
-
 
 }
