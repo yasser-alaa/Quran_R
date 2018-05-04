@@ -1,6 +1,5 @@
 package com.example.tefah.quran;
 
-import android.content.Context;
 import android.media.MediaPlayer;
 import android.media.MediaRecorder;
 import android.os.Environment;
@@ -15,11 +14,16 @@ import java.util.Locale;
  * Utility class for helper methods and static values
  */
 
-class Utilities {
+class Utils {
 
-    public static String startRecording(MediaRecorder recorder, Context context) {
+    /**
+     * function to start the media recorder and use helper functions to make the
+     * directory to save the audio file that will be recorded
+     * @param recorder media recorder
+     * @return the path of the audio file
+     */
+    public static String startRecording(MediaRecorder recorder) {
         String savedAudioPath = null;
-
         File storageDir = mainStorageDir();
         boolean success = true;
         storageDir = new File(storageDir.getPath() + "/audio");
@@ -30,9 +34,9 @@ class Utilities {
             String timeStamp = new SimpleDateFormat("ddMMyyyy_HHmmss",
                     Locale.getDefault()).format(new Date());
             // Record to the external cache directory for visibility
-            String audioFileName = timeStamp + " audioNote.3gp";
-            File imageFile = new File(storageDir, audioFileName);
-            savedAudioPath = imageFile.getAbsolutePath();
+            String audioFileName = timeStamp + "audioNote.3gp";
+            File audioFile = new File(storageDir, audioFileName);
+            savedAudioPath = audioFile.getAbsolutePath();
 
             recorder.setAudioSource(MediaRecorder.AudioSource.MIC);
             recorder.setOutputFormat(MediaRecorder.OutputFormat.THREE_GPP);
@@ -44,16 +48,24 @@ class Utilities {
             } catch (IOException e) {
                 e.printStackTrace();
             }
+            try {
+                recorder.start();
+            }catch (IllegalStateException e){
+                e.printStackTrace();
+            }
 
-            recorder.start();
         }
         return savedAudioPath;
+
     }
 
     public static void stopRecording(MediaRecorder recorder) {
-        recorder.stop();
-        recorder.release();
-        recorder = null;
+        try {
+            recorder.stop();
+            recorder.release();
+        }catch (IllegalStateException e){
+            e.printStackTrace();
+        }
     }
 
     private static File mainStorageDir(){
@@ -82,4 +94,5 @@ class Utilities {
         player.release();
         player = null;
     }
+
 }
