@@ -42,8 +42,9 @@ public class MainActivity extends AppCompatActivity  {
 
     private static  boolean RECODER_TIME_OK = false;
     private String audioPath;
-    MediaRecorder recorder;
+    public MediaRecorder recorder;
     MediaPlayer player;
+    private CountDownTimer timer;
 
 
 
@@ -81,6 +82,7 @@ public class MainActivity extends AppCompatActivity  {
                             recorder.release();
                             recorder = null;
                         }
+                        timer.cancel();
                         RECODER_TIME_OK = false;
                         break;
                     default:
@@ -93,7 +95,7 @@ public class MainActivity extends AppCompatActivity  {
 
     private void record() {
         audioPath = Utils.startRecording(recorder);
-        new CountDownTimer(2000, 1000) {
+        timer = new CountDownTimer(2000, 1000) {
 
             public void onTick(long millisUntilFinished) {
             }
