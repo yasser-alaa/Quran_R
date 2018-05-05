@@ -22,6 +22,7 @@ import android.view.View;
 import android.widget.Toast;
 
 import java.io.File;
+import java.io.IOException;
 import java.util.Timer;
 
 import butterknife.BindView;
@@ -37,7 +38,7 @@ import retrofit2.Response;
 
 public class MainActivity extends AppCompatActivity  {
 
-    public static final int MY_PERMISSIONS_REQUEST_RECORDE_AUDIO = 100 ;
+    public static final int MY_PERMISSIONS_REQUEST_RECORD_AUDIO = 100 ;
     public static final int MY_PERMISSIONS_REQUEST_WRITE_STORAGE = 200 ;
 
     private static  boolean RECODER_TIME_OK = false;
@@ -46,13 +47,10 @@ public class MainActivity extends AppCompatActivity  {
     MediaPlayer player;
     private CountDownTimer timer;
 
-
-
 @BindView(R.id.voice_recorder)
     FloatingActionButton voiceRecorder;
 @BindView(R.id.test_player)
     FloatingActionButton testPlayer;
-
 
     @SuppressLint("ClickableViewAccessibility")
     @Override
@@ -106,7 +104,6 @@ public class MainActivity extends AppCompatActivity  {
         }.start();
     }
 
-
     @OnClick(R.id.test_player)
     public void play(){
         if (audioPath != null)
@@ -144,7 +141,13 @@ public class MainActivity extends AppCompatActivity  {
             @Override
             public void onResponse(Call<ResponseBody> call,
                                    Response<ResponseBody> response) {
-//                Log.i("GET REQUEST", response.toString());
+                Log.i("POST REQUEST", call.toString());
+                try {
+                    Log.i("POST REQUEST", response.body().string());
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+                Log.i("POST REQUEST", response.toString());
                 Log.v("Upload", "success");
             }
 
@@ -171,7 +174,7 @@ public class MainActivity extends AppCompatActivity  {
                     // No explanation needed; request the permission
                     ActivityCompat.requestPermissions(this,
                             new String[]{Manifest.permission.RECORD_AUDIO},
-                            MY_PERMISSIONS_REQUEST_RECORDE_AUDIO);
+                            MY_PERMISSIONS_REQUEST_RECORD_AUDIO);
                 }
             } else audioGranted = true;
             if (ContextCompat.checkSelfPermission(this,
@@ -198,7 +201,7 @@ public class MainActivity extends AppCompatActivity  {
     public void onRequestPermissionsResult(int requestCode,
                                            String permissions[], int[] grantResults) {
         switch (requestCode) {
-            case MY_PERMISSIONS_REQUEST_RECORDE_AUDIO: {
+            case MY_PERMISSIONS_REQUEST_RECORD_AUDIO: {
                 // If request is cancelled, the result arrays are empty.
                 if (grantResults.length > 0
                         && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
