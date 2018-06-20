@@ -15,9 +15,9 @@ import java.util.List;
  * Created by yasseralaa on 15/05/18.
  */
 
-public class GreenAdapter extends RecyclerView.Adapter<GreenAdapter.NumberViewHolder> {
+public class Asma2ElsewarAdapter extends RecyclerView.Adapter<Asma2ElsewarAdapter.NumberViewHolder> {
 
-    private static final String TAG = GreenAdapter.class.getSimpleName();
+    private static final String TAG = Asma2ElsewarAdapter.class.getSimpleName();
     private List<String> messages;
     private Cursor mCursor;
 
@@ -44,13 +44,13 @@ public class GreenAdapter extends RecyclerView.Adapter<GreenAdapter.NumberViewHo
 
     // Add a ListItemClickListener as a parameter to the constructor and store it in mOnClickListener
     /**
-     * Constructor for GreenAdapter that accepts a number of items to display and the specification
+     * Constructor for Asma2ElsewarAdapter that accepts a number of items to display and the specification
      * for the ListItemClickListener.
      *
      * @param numberOfItems Number of items to display in list
      * @param listener Listener for list item clicks
      */
-    public GreenAdapter(int numberOfItems,Cursor cursor ,ListItemClickListener listener ,List<String> l) {
+    public Asma2ElsewarAdapter(int numberOfItems, Cursor cursor , ListItemClickListener listener , List<String> l) {
         mNumberItems = numberOfItems;
         mOnClickListener = listener;
         viewHolderCount = 0;
@@ -155,7 +155,7 @@ public class GreenAdapter extends RecyclerView.Adapter<GreenAdapter.NumberViewHo
          * TextViews and set an onClickListener to listen for clicks. Those will be handled in the
          * onClick method below.
          * @param itemView The View that you inflated in
-         *                 {@link GreenAdapter#onCreateViewHolder(ViewGroup, int)}
+         *                 {@link Asma2ElsewarAdapter#onCreateViewHolder(ViewGroup, int)}
          */
         public NumberViewHolder(View itemView) {
             super(itemView);

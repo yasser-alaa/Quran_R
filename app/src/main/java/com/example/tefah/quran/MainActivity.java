@@ -2,7 +2,6 @@ package com.example.tefah.quran;
 
 import android.Manifest;
 import android.annotation.SuppressLint;
-import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
@@ -10,10 +9,8 @@ import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.media.MediaPlayer;
 import android.media.MediaRecorder;
-import android.net.Uri;
 import android.os.Build;
 import android.os.CountDownTimer;
-import android.support.annotation.NonNull;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
@@ -27,9 +24,6 @@ import android.view.View;
 import android.widget.Toast;
 
 import com.example.tefah.quran.data.DataBaseHelper;
-import com.example.tefah.quran.data.QuranDbContract;
-import com.example.tefah.quran.data.QuranDbHelper;
-import com.example.tefah.quran.data.TestUtil;
 
 import java.io.File;
 import java.io.FileOutputStream;
@@ -37,7 +31,6 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Timer;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
@@ -50,9 +43,9 @@ import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
 
-public class MainActivity extends AppCompatActivity implements GreenAdapter.ListItemClickListener {
+public class MainActivity extends AppCompatActivity implements Asma2ElsewarAdapter.ListItemClickListener {
 
-    private GreenAdapter mAdapter;
+    private Asma2ElsewarAdapter mAdapter;
     private RecyclerView mNumbersList;
     ArrayList<String> messages = new ArrayList<String>();
     List<String> mnames ;
@@ -126,21 +119,12 @@ public class MainActivity extends AppCompatActivity implements GreenAdapter.List
          * change the child layout size in the RecyclerView
          */
         mNumbersList.setHasFixedSize(true);
-        QuranDbHelper quranDbHelper = new QuranDbHelper(this);
-        mDb = quranDbHelper.getWritableDatabase();
-
-        //Fill the database with fake data
-        TestUtil.insertFakeData(mDb);
-
-        // COMPLETED (13) Pass in this as the ListItemClickListener to the GreenAdapter constructor
+        // COMPLETED (13) Pass in this as the ListItemClickListener to the Asma2ElsewarAdapter constructor
         /*
-         * The GreenAdapter is responsible for displaying each item in the list.
+         * The Asma2ElsewarAdapter is responsible for displaying each item in the list.
          */
-        mCursor = getallSwarNames() ;
-        cursor2 = suraAyaNumber("113-2");
-
-        // mAdapter = new GreenAdapter(NUM_LIST_ITEMS,mCursor,this,messages);
-        mAdapter = new GreenAdapter(NUM_LIST_ITEMS,cursor2,this,mnames);
+        // mAdapter = new Asma2ElsewarAdapter(NUM_LIST_ITEMS,mCursor,this,messages);
+        mAdapter = new Asma2ElsewarAdapter(NUM_LIST_ITEMS,cursor2,this,mnames);
         mNumbersList.setAdapter(mAdapter);
 
 
@@ -315,17 +299,6 @@ public class MainActivity extends AppCompatActivity implements GreenAdapter.List
         }
     }
 
-    public Cursor getallSwarNames(){
-        return mDb.query(
-                QuranDbContract.QuranEntry.TABLE_NAME,
-                null,
-                null,
-                null,
-                null,
-                null, QuranDbContract.QuranEntry.COLUMN_SURA_ID
-        );
-    }
-
     // COMPLETED (10) Override ListItemClickListener's onListItemClick method
     /**
      * This is where we receive our callback from
@@ -376,19 +349,6 @@ public class MainActivity extends AppCompatActivity implements GreenAdapter.List
     }
 
 
-    public Cursor suraAyaNumber(String suraAyaNum){
-        // int ayaNumberINT =  suraAyaNum.charAt(suraAyaNum.length()-1);
-        String ayaNumberSTR = suraAyaNum.substring(suraAyaNum.length()-1);
-        String suraNumberSTR = suraAyaNum.substring(0,suraAyaNum.length()-2);
-        // int suraNumberINT = Integer.getInteger(suraNumberSTR) ;
-
-        Cursor cursor2=mDb.rawQuery("SELECT * FROM "+ QuranDbContract.QuranEntry.TABLE_NAME + " WHERE "
-                + QuranDbContract.QuranEntry.COLUMN_SURA_ID + " = " + suraNumberSTR + " AND " + QuranDbContract.QuranEntry.COLUMN_VERSE_ID +
-                " = "+ ayaNumberSTR,null);
-
-        return cursor2;
-        // mDb.query(QuranDbContract.QuranEntry.TABLE_NAME, QuranDbContract.QuranEntry.COLUMN_VERSE_TEXT,"WHERE "+ QuranDbContract.QuranEntry.COLUMN_VERSE_ID + " = "+ String.valueOf(ayaNumber),null,null,)
-    }
     private boolean copyDatabase(Context context) {
         try {
 
