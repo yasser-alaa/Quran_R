@@ -317,8 +317,7 @@ public class MainActivity extends AppCompatActivity implements Asma2ElsewarAdapt
         // String nameOfSura = messages.get(clickedItemIndex);
 
         Intent startChildActivityIntent = new Intent(context, Main2Activity.class);
-        startChildActivityIntent.putExtra(Intent.EXTRA_TEXT,aya);
-        //startChildActivityIntent.putExtra(Intent.EXTRA_TEXT,clickedItemIndex);
+        startChildActivityIntent.putExtra(Intent.EXTRA_TEXT,clickedItemIndex);
 
         startActivity(startChildActivityIntent);
 

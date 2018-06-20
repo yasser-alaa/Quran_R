@@ -5,6 +5,8 @@ import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
 
+import com.example.tefah.quran.POJO.Aya;
+
 import java.util.ArrayList;
 import java.util.List;
 
@@ -49,6 +51,24 @@ public class DataBaseHelper extends SQLiteOpenHelper {
         cursor.close();
         closeDatabase();
         return ayaText;
+    }
+    public List<Aya> getListProduct(int suraNumber) {
+        String Sura = Integer.toString(suraNumber);
+
+        List<Aya> ayaList = new ArrayList<>();
+        openDatabase();
+        Cursor cursor = mDatabase.rawQuery("SELECT text FROM quran_text where sura = "+Sura, null);
+        cursor.moveToFirst();
+        int counter = 0;
+        while (!cursor.isAfterLast()) {
+
+            ayaList.add(new Aya(cursor.getString(cursor.getColumnIndex("text")), counter));
+            counter++;
+            cursor.moveToNext();
+        }
+        cursor.close();
+        closeDatabase();
+        return ayaList;
     }
     public static List<String> suraNames(){
         List<String> suraName = new ArrayList<String>();
