@@ -37,7 +37,19 @@ public class DataBaseHelper extends SQLiteOpenHelper {
             mDatabase.close();
         }
     }
+    public  String getaya(int ayaNumber , int suraNumber){
+        String Sura = Integer.toString(suraNumber);
+        String aya = Integer.toString(ayaNumber);
+        openDatabase();
 
+        Cursor cursor =  mDatabase.rawQuery("SELECT text FROM quran_text WHERE sura = "+Sura+" and aya = "+ayaNumber,null);
+
+       cursor.moveToFirst();
+        String ayaText = cursor.getString(cursor.getColumnIndex("text"));
+        cursor.close();
+        closeDatabase();
+        return ayaText;
+    }
     public static List<String> suraNames(){
         List<String> suraName = new ArrayList<String>();
         suraName.add("سورة البقرة");
