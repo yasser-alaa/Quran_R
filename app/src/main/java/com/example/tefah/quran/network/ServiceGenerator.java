@@ -1,4 +1,4 @@
-package com.example.tefah.quran;
+package com.example.tefah.quran.network;
 
 import okhttp3.OkHttpClient;
 import retrofit2.Retrofit;
@@ -6,7 +6,7 @@ import retrofit2.converter.gson.GsonConverterFactory;
 
 public class ServiceGenerator {
 
-    private static final String BASE_URL = "http://41.237.129.162:12000";
+    private static final String BASE_URL = "http://4.4.4.21:5000";
 
     private static Retrofit.Builder builder =
             new Retrofit.Builder()

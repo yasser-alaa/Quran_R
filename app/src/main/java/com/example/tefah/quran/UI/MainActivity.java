@@ -1,4 +1,4 @@
-package com.example.tefah.quran;
+package com.example.tefah.quran.UI;
 
 import android.Manifest;
 import android.annotation.SuppressLint;
@@ -23,7 +23,13 @@ import android.view.MotionEvent;
 import android.view.View;
 import android.widget.Toast;
 
+import com.example.tefah.quran.Asma2ElsewarAdapter;
+import com.example.tefah.quran.Main2Activity;
+import com.example.tefah.quran.R;
+import com.example.tefah.quran.Utils;
 import com.example.tefah.quran.data.DataBaseHelper;
+import com.example.tefah.quran.network.FileUploadService;
+import com.example.tefah.quran.network.ServiceGenerator;
 
 import java.io.File;
 import java.io.IOException;
@@ -83,7 +89,7 @@ public class MainActivity extends AppCompatActivity implements Asma2ElsewarAdapt
         mDBHelper = new DataBaseHelper(this);
         // check exists Database
         File database = getApplicationContext().getDatabasePath(DataBaseHelper.DBNAME);
-        if(false == database.exists()) {
+        if(!database.exists()) {
             mDBHelper.getReadableDatabase();
             //Copy db
             if(copyDatabase(this)) {
@@ -210,9 +216,10 @@ public class MainActivity extends AppCompatActivity implements Asma2ElsewarAdapt
             @Override
             public void onResponse(Call<ResponseBody> call,
                                    Response<ResponseBody> response) {
-                Log.i("POST REQUEST", call.toString());
                 try {
                     Log.i("POST REQUEST", response.body().string());
+                    Toast.makeText(MainActivity.this, response.body().string(), Toast.LENGTH_LONG)
+                            .show();
                 } catch (IOException e) {
                     e.printStackTrace();
                 }

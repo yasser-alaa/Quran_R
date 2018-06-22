@@ -1,4 +1,4 @@
-package com.example.tefah.quran;
+package com.example.tefah.quran.network;
 
 import okhttp3.MultipartBody;
 import okhttp3.RequestBody;
@@ -19,8 +19,8 @@ public interface FileUploadService {
     Call<ResponseBody> upload(
             @Part MultipartBody.Part file
     );
-    @GET("/")
-    Call<ResponseBody> getHtml();
+    @GET("/uploads")
+    Call<ResponseBody> getAgain();
 }
 //description might be used later
 //    @Part("description") RequestBody description,

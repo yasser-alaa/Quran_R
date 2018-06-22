@@ -14,7 +14,7 @@ import java.util.Locale;
  * Utility class for helper methods and static values
  */
 
-class Utils {
+public class Utils {
 
     /**
      * function to start the media recorder and use helper functions to make the
