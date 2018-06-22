@@ -59,9 +59,9 @@ public class MainActivity extends AppCompatActivity implements Asma2ElsewarAdapt
     List<String> mnames ;
     private SQLiteDatabase mDb;
     Cursor mCursor;
-    Cursor cursor2;
     private static final int NUM_LIST_ITEMS = 114;
     private DataBaseHelper mDBHelper;
+    String aya = "";
     //------------------------------------------------
 
     public static final int MY_PERMISSIONS_REQUEST_RECORD_AUDIO = 100 ;
@@ -87,6 +87,7 @@ public class MainActivity extends AppCompatActivity implements Asma2ElsewarAdapt
 
         //------------------------------------------------------------------
         mDBHelper = new DataBaseHelper(this);
+      Log.d("stop after query","msg");
         // check exists Database
         File database = getApplicationContext().getDatabasePath(DataBaseHelper.DBNAME);
         if(!database.exists()) {
@@ -99,6 +100,8 @@ public class MainActivity extends AppCompatActivity implements Asma2ElsewarAdapt
                 return;
             }
         }
+        aya =  mDBHelper.getaya(1,1);
+
         mnames =  mDBHelper.suraNames();
 
                /*
@@ -128,7 +131,7 @@ public class MainActivity extends AppCompatActivity implements Asma2ElsewarAdapt
          * The Asma2ElsewarAdapter is responsible for displaying each item in the list.
          */
         // mAdapter = new Asma2ElsewarAdapter(NUM_LIST_ITEMS,mCursor,this,messages);
-        mAdapter = new Asma2ElsewarAdapter(NUM_LIST_ITEMS,cursor2,this,mnames);
+        mAdapter = new Asma2ElsewarAdapter(NUM_LIST_ITEMS,mCursor,this,mnames);
         mNumbersList.setAdapter(mAdapter);
 
 
@@ -324,7 +327,6 @@ public class MainActivity extends AppCompatActivity implements Asma2ElsewarAdapt
         // String nameOfSura = messages.get(clickedItemIndex);
 
         Intent startChildActivityIntent = new Intent(context, Main2Activity.class);
-
         startChildActivityIntent.putExtra(Intent.EXTRA_TEXT,clickedItemIndex);
 
         startActivity(startChildActivityIntent);
@@ -379,6 +381,7 @@ public class MainActivity extends AppCompatActivity implements Asma2ElsewarAdapt
             return false;
         }
     }
+
 }
 
 /**
