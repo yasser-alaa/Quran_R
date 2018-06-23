@@ -1,7 +1,8 @@
-package com.example.tefah.quran;
+package com.example.tefah.quran.UI;
 
 import android.content.Context;
 import android.content.Intent;
+import android.graphics.Typeface;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
@@ -9,6 +10,8 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.example.tefah.quran.POJO.Aya;
+import com.example.tefah.quran.R;
+import com.example.tefah.quran.Utils;
 import com.example.tefah.quran.data.DataBaseHelper;
 
 import java.io.File;
@@ -18,12 +21,12 @@ import java.io.OutputStream;
 import java.util.List;
 
 public class Main2Activity extends AppCompatActivity {
+
     private int suraNumber;
     String aya = "";
     private DataBaseHelper mDBHelper;
     List<Aya> Ayas;
     TextView QuranView ;
-    List<String> separators;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -34,7 +37,7 @@ public class Main2Activity extends AppCompatActivity {
         mDBHelper = new DataBaseHelper(this);
         // check exists Database
         File database = getApplicationContext().getDatabasePath(DataBaseHelper.DBNAME);
-        if(false == database.exists()) {
+        if(!database.exists()) {
             mDBHelper.getReadableDatabase();
             //Copy db
             if(copyDatabase(this)) {
@@ -45,15 +48,17 @@ public class Main2Activity extends AppCompatActivity {
             }
         }
 
-        QuranView = (TextView) findViewById(R.id.QuranView);
+        QuranView =  findViewById(R.id.QuranView);
         aya =  mDBHelper.getaya(1,1);
         Ayas = mDBHelper.getListProduct(2);
         String sora = "";
         for (Aya ayaTemp : Ayas){
             sora += ayaTemp.getAyasText();
-            sora += " ﴿" + ayaTemp.getAyaNum() + "﴾";
+            sora += " ﴿ " + (ayaTemp.getAyaNum()+1) + " ﴾ ";
         }
-        QuranView.setText(sora);
+        QuranView.setText(Utils.translateNumbers(sora));
+        Typeface custom_font = Typeface.createFromAsset(getAssets(),  "ZekrQuran.ttf");
+        QuranView.setTypeface(custom_font);
 
 
 

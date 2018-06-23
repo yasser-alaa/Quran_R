@@ -24,7 +24,6 @@ import android.view.View;
 import android.widget.Toast;
 
 import com.example.tefah.quran.Asma2ElsewarAdapter;
-import com.example.tefah.quran.Main2Activity;
 import com.example.tefah.quran.R;
 import com.example.tefah.quran.Utils;
 import com.example.tefah.quran.data.DataBaseHelper;
