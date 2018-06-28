@@ -1,5 +1,6 @@
 package com.example.tefah.quran;
 
+import android.content.res.AssetFileDescriptor;
 import android.media.MediaPlayer;
 import android.media.MediaRecorder;
 import android.os.Environment;
@@ -98,9 +99,13 @@ public class Utils {
         return storageDir;
     }
 
-    public static void startPlaying(MediaPlayer player, String audioFileName, MediaPlayer.OnSeekCompleteListener listener) {
+    public static void startPlaying(MediaPlayer player, AssetFileDescriptor assetFileDescriptor,
+                                    MediaPlayer.OnSeekCompleteListener listener) {
         try {
-            player.setDataSource(audioFileName);
+            player.setDataSource(assetFileDescriptor.getFileDescriptor(),
+                    assetFileDescriptor.getStartOffset(),
+                    assetFileDescriptor.getLength());
+//            player.setDataSource(audioFileName);
             player.prepare();
             player.start();
             player.setOnSeekCompleteListener(listener);

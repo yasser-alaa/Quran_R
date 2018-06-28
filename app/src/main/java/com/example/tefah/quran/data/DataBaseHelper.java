@@ -61,7 +61,6 @@ public class DataBaseHelper extends SQLiteOpenHelper {
         cursor.moveToFirst();
         int counter = 0;
         while (!cursor.isAfterLast()) {
-
             ayaList.add(new Aya(cursor.getString(cursor.getColumnIndex("text")), counter));
             counter++;
             cursor.moveToNext();

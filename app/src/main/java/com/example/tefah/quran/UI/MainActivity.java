@@ -5,6 +5,7 @@ import android.annotation.SuppressLint;
 import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
+import android.content.res.AssetFileDescriptor;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.media.MediaPlayer;
@@ -50,7 +51,8 @@ import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
 
-public class MainActivity extends AppCompatActivity implements Asma2ElsewarAdapter.ListItemClickListener {
+public class MainActivity extends AppCompatActivity implements Asma2ElsewarAdapter.ListItemClickListener,
+        MediaPlayer.OnSeekCompleteListener{
 
     private Asma2ElsewarAdapter mAdapter;
     private RecyclerView mNumbersList;
@@ -84,7 +86,7 @@ public class MainActivity extends AppCompatActivity implements Asma2ElsewarAdapt
         setContentView(R.layout.activity_main);
         ButterKnife.bind(this);
 
-        //------------------------------------------------------------------
+
         mDBHelper = new DataBaseHelper(this);
       Log.d("stop after query","msg");
         // check exists Database
@@ -100,43 +102,16 @@ public class MainActivity extends AppCompatActivity implements Asma2ElsewarAdapt
             }
         }
         aya =  mDBHelper.getaya(1,1);
-
         mnames =  mDBHelper.suraNames();
 
-               /*
-         * Using findViewById, we get a reference to our RecyclerView from xml. This allows us to
-         * do things like set the adapter of the RecyclerView and toggle the visibility.
-         */
-        mNumbersList = (RecyclerView) findViewById(R.id.rv_numbers);
+        mNumbersList = findViewById(R.id.rv_numbers);
 
-    /*
-     * A LinearLayoutManager is responsible for measuring and positioning item views within a
-     * RecyclerView into a linear list. This means that it can produce either a horizontal or
-     * vertical list depending on which parameter you pass in to the LinearLayoutManager
-     * constructor. By default, if you don't specify an orientation, you get a vertical list.
-     * In our case, we want a vertical list, so we don't need to pass in an orientation flag to
-     * the LinearLayoutManager constructor.
-     */
         LinearLayoutManager layoutManager = new LinearLayoutManager(this);
         mNumbersList.setLayoutManager(layoutManager);
-
-        /*
-         * Use this setting to improve performance if you know that changes in content do not
-         * change the child layout size in the RecyclerView
-         */
         mNumbersList.setHasFixedSize(true);
-        // COMPLETED (13) Pass in this as the ListItemClickListener to the Asma2ElsewarAdapter constructor
-        /*
-         * The Asma2ElsewarAdapter is responsible for displaying each item in the list.
-         */
-        // mAdapter = new Asma2ElsewarAdapter(NUM_LIST_ITEMS,mCursor,this,messages);
         mAdapter = new Asma2ElsewarAdapter(NUM_LIST_ITEMS,mCursor,this,mnames);
         mNumbersList.setAdapter(mAdapter);
 
-
-        //-------------------------------------------------------------------
-
-//        it has a problem with accessability i can search for it later
         voiceRecorder.setOnTouchListener(new View.OnTouchListener() {
             @Override
             public boolean onTouch(View view, MotionEvent motionEvent) {
@@ -145,6 +120,7 @@ public class MainActivity extends AppCompatActivity implements Asma2ElsewarAdapt
                     case MotionEvent.ACTION_DOWN:
                         recorder = new MediaRecorder();
                         if (grantPermission()) {
+                            tennn();
                             record();
                         }
                         break;
@@ -152,6 +128,7 @@ public class MainActivity extends AppCompatActivity implements Asma2ElsewarAdapt
                         if (RECODER_TIME_OK) {
                             Utils.stopRecording(recorder);
                         } else {
+                            recordStopSound();
                             Toast.makeText(MainActivity.this, "Hold to record voice",
                                     Toast.LENGTH_SHORT).show();
                             recorder.release();
@@ -166,6 +143,38 @@ public class MainActivity extends AppCompatActivity implements Asma2ElsewarAdapt
             }
 
         });
+    }
+
+    /**
+     * play sound to indicate something wrong with recording
+     */
+    private void recordStopSound() {
+        if (player != null){
+            onSeekComplete(player);
+        }
+        player = new MediaPlayer();
+        try {
+            AssetFileDescriptor assetFileDescriptor = getAssets().openFd("recorde_stop.mp3");
+            Utils.startPlaying(player, assetFileDescriptor, this);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+    /**
+     * play sound to indicate recording
+     */
+    private void tennn() {
+        if (player != null){
+            onSeekComplete(player);
+        }
+        player = new MediaPlayer();
+        try {
+            AssetFileDescriptor assetFileDescriptor = getAssets().openFd("recording.mp3");
+            Utils.startPlaying(player, assetFileDescriptor, this);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
     }
 
     private void record() {
@@ -204,13 +213,7 @@ public class MainActivity extends AppCompatActivity implements Asma2ElsewarAdapt
         MultipartBody.Part body =
                 MultipartBody.Part.createFormData("audio", file.getName(), requestFile);
 
-        // add another part within the multipart request
-        String descriptionString = "hello, this is description speaking";
-        RequestBody description =
-                RequestBody.create(
-                        okhttp3.MultipartBody.FORM, descriptionString);
-
-        // finally, execute the request
+       // finally, execute the request
         Call<ResponseBody> call = service.upload(body);
 
 //        Call<ResponseBody> call = service.getHtml();
@@ -311,7 +314,7 @@ public class MainActivity extends AppCompatActivity implements Asma2ElsewarAdapt
         }
     }
 
-    // COMPLETED (10) Override ListItemClickListener's onListItemClick method
+
     /**
      * This is where we receive our callback from
      * {}
@@ -329,33 +332,6 @@ public class MainActivity extends AppCompatActivity implements Asma2ElsewarAdapt
         startChildActivityIntent.putExtra(Intent.EXTRA_TEXT,clickedItemIndex);
 
         startActivity(startChildActivityIntent);
-
-        //---------------------------------------------------------
-
-        // (11) In the beginning of the method, cancel the Toast if it isn't null
-        /*
-         * Even if a Toast isn't showing, it's okay to cancel it. Doing so
-         * ensures that our new Toast will show immediately, rather than
-         * being delayed while other pending Toasts are shown.
-         *
-         * Comment out these three lines, run the app, and click on a bunch of
-         * different items if you're not sure what I'm talking about.
-         */
-//        if (mToast != null) {
-//            mToast.cancel();
-//        }
-
-        //(12) Show a Toast when an item is clicked, displaying that item number that was clicked
-        /*
-         * Create a Toast and store it in our Toast field.
-         * The Toast that shows up will have a message similar to the following:
-         *
-         *                     Item #42 clicked.
-         */
-//        String toastMessage = "Item #" + clickedItemIndex + " clicked.";
-//        mToast = Toast.makeText(this, toastMessage, Toast.LENGTH_LONG);
-//
-//        mToast.show();
 
     }
 
@@ -381,6 +357,18 @@ public class MainActivity extends AppCompatActivity implements Asma2ElsewarAdapt
         }
     }
 
+    @Override
+    public void onSeekComplete(MediaPlayer mediaPlayer) {
+        Utils.stopPlaying(mediaPlayer);
+    }
+
+    @Override
+    protected void onStop() {
+        super.onStop();
+        if (player != null) {
+            onSeekComplete(player);
+        }
+    }
 }
 
 /**
@@ -397,3 +385,4 @@ abstract class CustomTouchView extends FloatingActionButton {
     @Override
     public abstract boolean performClick();
 }
+

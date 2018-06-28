@@ -106,22 +106,6 @@ public class Asma2ElsewarAdapter extends RecyclerView.Adapter<Asma2ElsewarAdapte
      */
     @Override
     public void onBindViewHolder(NumberViewHolder holder, int position) {
-        //move cursor to item will be displayed
-       /* if (!mCursor.moveToPosition(position)){
-            Log.d(TAG,"cursor not move");
-            return;
-
-        }*/
-/*
-
-        String nameOfSura = mCursor.getString(mCursor.getColumnIndex
-                (QuranDbContract.QuranEntry.COLUMN_VERSE_TEXT));
-
-        holder.listItemNumberView.setText(nameOfSura);
-
-*/
-
-
         Log.d(TAG, "#" + position);
         holder.bind(position);
     }
@@ -138,7 +122,6 @@ public class Asma2ElsewarAdapter extends RecyclerView.Adapter<Asma2ElsewarAdapte
         return mNumberItems;
     }
 
-    // Implement OnClickListener in the NumberViewHolder class
     /**
      * Cache of the children views for a list item.
      */
@@ -149,6 +132,7 @@ public class Asma2ElsewarAdapter extends RecyclerView.Adapter<Asma2ElsewarAdapte
         TextView listItemNumberView;
         // Will display which ViewHolder is displaying this data
         TextView viewHolderIndex;
+        int position;
 
         /**
          * Constructor for our ViewHolder. Within this constructor, we get a reference to our
@@ -157,7 +141,7 @@ public class Asma2ElsewarAdapter extends RecyclerView.Adapter<Asma2ElsewarAdapte
          * @param itemView The View that you inflated in
          *                 {@link Asma2ElsewarAdapter#onCreateViewHolder(ViewGroup, int)}
          */
-        public NumberViewHolder(View itemView) {
+        NumberViewHolder(View itemView) {
             super(itemView);
 
             listItemNumberView = (TextView) itemView.findViewById(R.id.tv_item_number);
@@ -173,6 +157,7 @@ public class Asma2ElsewarAdapter extends RecyclerView.Adapter<Asma2ElsewarAdapte
          */
         void bind(int listIndex) {
             listItemNumberView.setText(messages.get(listIndex));
+            position = listIndex;
         }
 
 
@@ -183,8 +168,8 @@ public class Asma2ElsewarAdapter extends RecyclerView.Adapter<Asma2ElsewarAdapte
          */
         @Override
         public void onClick(View v) {
-            int clickedPosition = getAdapterPosition();
-            mOnClickListener.onListItemClick(clickedPosition);
+//            int clickedPosition = getAdapterPosition();
+            mOnClickListener.onListItemClick(position);
         }
     }
 }
