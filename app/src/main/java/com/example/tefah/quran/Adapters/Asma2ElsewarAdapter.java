@@ -1,13 +1,15 @@
-package com.example.tefah.quran;
+package com.example.tefah.quran.Adapters;
 
 import android.content.Context;
-import android.database.Cursor;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
+
+import com.example.tefah.quran.ColorUtils;
+import com.example.tefah.quran.R;
 
 import java.util.List;
 

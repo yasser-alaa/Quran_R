@@ -1,4 +1,4 @@
-package com.example.tefah.quran.POJO;
+package com.example.tefah.quran.QuranInfo;
 
 import java.util.List;
 
@@ -7,14 +7,17 @@ import java.util.List;
  */
 
 public class Aya {
-    private String AyasText ;
+    private String ayahText ;
     int ayaNum;
+    boolean startPage=false,endPage=false;
 
-    public Aya(String ayasText, int ayaNum) {
-        AyasText = ayasText;
+    public Aya(String ayahText, int ayaNum) {
+        this.ayahText = ayahText;
         this.ayaNum = ayaNum;
     }
-
+    public Aya(String ayahText) {
+        this.ayahText = ayahText;
+    }
     public int getAyaNum() {
         return ayaNum;
     }
@@ -23,17 +26,26 @@ public class Aya {
         this.ayaNum = ayaNum;
     }
 
-    public Aya(String ayasText) {
-        AyasText = ayasText;
+    public String getAyahText() {
+        return ayahText;
     }
 
-    public String getAyasText() {
-        return AyasText;
+    public void setAyahText(String ayasText) {
+        ayahText = ayasText;
+    }
+    public boolean isStartPage() {
+        return startPage;
     }
 
-    public void setAyasText(String ayasText) {
-        AyasText = ayasText;
+    public void setStartPage(boolean startPage) {
+        this.startPage = startPage;
     }
 
+    public boolean isEndPage() {
+        return endPage;
+    }
 
+    public void setEndPage(boolean endPage) {
+        this.endPage = endPage;
+    }
 }

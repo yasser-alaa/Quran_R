@@ -6,8 +6,6 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.content.res.AssetFileDescriptor;
-import android.database.Cursor;
-import android.database.sqlite.SQLiteDatabase;
 import android.media.MediaPlayer;
 import android.media.MediaRecorder;
 import android.os.Build;
@@ -24,9 +22,9 @@ import android.view.MotionEvent;
 import android.view.View;
 import android.widget.Toast;
 
-import com.example.tefah.quran.Asma2ElsewarAdapter;
 import com.example.tefah.quran.R;
 import com.example.tefah.quran.Utils;
+import com.example.tefah.quran.Adapters.Asma2ElsewarAdapter;
 import com.example.tefah.quran.data.DataBaseHelper;
 import com.example.tefah.quran.network.FileUploadService;
 import com.example.tefah.quran.network.ServiceGenerator;
@@ -37,7 +35,6 @@ import java.io.IOException;
 import java.io.FileOutputStream;
 import java.io.InputStream;
 import java.io.OutputStream;
-import java.util.ArrayList;
 import java.util.List;
 
 import butterknife.BindView;
@@ -55,14 +52,10 @@ public class MainActivity extends AppCompatActivity implements Asma2ElsewarAdapt
         MediaPlayer.OnSeekCompleteListener{
 
     private Asma2ElsewarAdapter mAdapter;
-    private RecyclerView mNumbersList;
-    ArrayList<String> messages = new ArrayList<String>();
-    List<String> mnames ;
-    private SQLiteDatabase mDb;
-    Cursor mCursor;
+    private RecyclerView mSewarList;
+    List<String> mSewarNames ;
     private static final int NUM_LIST_ITEMS = 114;
     private DataBaseHelper mDBHelper;
-    String aya = "";
     //------------------------------------------------
 
     public static final int MY_PERMISSIONS_REQUEST_RECORD_AUDIO = 100 ;
@@ -90,8 +83,10 @@ public class MainActivity extends AppCompatActivity implements Asma2ElsewarAdapt
         mDBHelper = new DataBaseHelper(this);
       Log.d("stop after query","msg");
         // check exists Database
-        File database = getApplicationContext().getDatabasePath(DataBaseHelper.DBNAME);
-        if(!database.exists()) {
+
+       /* File database = getApplicationContext().getDatabasePath(DataBaseHelper.DBNAME);
+        if(false == database.exists()) {
+>>>>>>> 2bebaf353913428ff9950f4986c3560c2c2aed73:app/src/main/java/com/example/tefah/quran/MainActivity.java
             mDBHelper.getReadableDatabase();
             //Copy db
             if(copyDatabase(this)) {
@@ -101,6 +96,7 @@ public class MainActivity extends AppCompatActivity implements Asma2ElsewarAdapt
                 return;
             }
         }
+<<<<<<< HEAD:app/src/main/java/com/example/tefah/quran/UI/MainActivity.java
         aya =  mDBHelper.getaya(1,1);
         mnames =  mDBHelper.suraNames();
 
@@ -111,6 +107,38 @@ public class MainActivity extends AppCompatActivity implements Asma2ElsewarAdapt
         mNumbersList.setHasFixedSize(true);
         mAdapter = new Asma2ElsewarAdapter(NUM_LIST_ITEMS,this,mnames);
         mNumbersList.setAdapter(mAdapter);
+=======
+*/
+        mSewarNames =  DataBaseHelper.suraNames();
+
+        /*
+         * Using findViewById, we get a reference to our RecyclerView from xml. This allows us to
+         * do things like set the adapter of the RecyclerView and toggle the visibility.
+         */
+        mSewarList= findViewById(R.id.namesOfsewar);
+
+    /*
+     * A LinearLayoutManager is responsible for measuring and positioning item views within a
+     * RecyclerView into a linear list. This means that it can produce either a horizontal or
+     * vertical list depending on which parameter you pass in to the LinearLayoutManager
+     * constructor. By default, if you don't specify an orientation, you get a vertical list.
+     * In our case, we want a vertical list, so we don't need to pass in an orientation flag to
+     * the LinearLayoutManager constructor.
+     */
+        LinearLayoutManager layoutManager = new LinearLayoutManager(this);
+        mSewarList.setLayoutManager(layoutManager);
+
+        /*
+         * Use this setting to improve performance if you know that changes in content do not
+         * change the child layout size in the RecyclerView
+         */
+        mSewarList.setHasFixedSize(true);
+        //Pass in this as the ListItemClickListener to the Asma2ElsewarAdapter constructor
+        /*
+         * The Asma2ElsewarAdapter is responsible for displaying each item in the list.
+         */
+        mAdapter = new Asma2ElsewarAdapter(NUM_LIST_ITEMS,this,mSewarNames);
+        mSewarList.setAdapter(mAdapter);
 
         voiceRecorder.setOnTouchListener(new View.OnTouchListener() {
             @Override
@@ -275,9 +303,7 @@ public class MainActivity extends AppCompatActivity implements Asma2ElsewarAdapt
                             MY_PERMISSIONS_REQUEST_WRITE_STORAGE);
                 }
             } else writeGranted = true;
-            if (audioGranted  && writeGranted)
-                return true;
-            else return false;
+            return audioGranted && writeGranted;
         } else
                 return true;
     }
@@ -340,7 +366,7 @@ public class MainActivity extends AppCompatActivity implements Asma2ElsewarAdapt
     }
 
 
-    private boolean copyDatabase(Context context) {
+   /* private boolean copyDatabase(Context context) {
         try {
 
             InputStream inputStream = context.getAssets().open(DataBaseHelper.DBNAME);
@@ -359,7 +385,7 @@ public class MainActivity extends AppCompatActivity implements Asma2ElsewarAdapt
             e.printStackTrace();
             return false;
         }
-    }
+    }*/
 
     @Override
     public void onSeekComplete(MediaPlayer mediaPlayer) {
