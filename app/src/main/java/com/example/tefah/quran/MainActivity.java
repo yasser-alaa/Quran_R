@@ -5,8 +5,6 @@ import android.annotation.SuppressLint;
 import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
-import android.database.Cursor;
-import android.database.sqlite.SQLiteDatabase;
 import android.media.MediaPlayer;
 import android.media.MediaRecorder;
 import android.os.Build;
@@ -23,13 +21,13 @@ import android.view.MotionEvent;
 import android.view.View;
 import android.widget.Toast;
 
+import com.example.tefah.quran.Adapters.Asma2ElsewarAdapter;
 import com.example.tefah.quran.data.DataBaseHelper;
 
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.InputStream;
 import java.io.OutputStream;
-import java.util.ArrayList;
 import java.util.List;
 
 import butterknife.BindView;
@@ -46,14 +44,10 @@ import retrofit2.Response;
 public class MainActivity extends AppCompatActivity implements Asma2ElsewarAdapter.ListItemClickListener {
 
     private Asma2ElsewarAdapter mAdapter;
-    private RecyclerView mNumbersList;
-    ArrayList<String> messages = new ArrayList<String>();
-    List<String> mnames ;
-    private SQLiteDatabase mDb;
-    Cursor mCursor;
+    private RecyclerView mSewarList;
+    List<String> mSewarNames ;
     private static final int NUM_LIST_ITEMS = 114;
     private DataBaseHelper mDBHelper;
-    String aya = "";
     //------------------------------------------------
 
     //-------------------------------------------------
@@ -85,7 +79,7 @@ public class MainActivity extends AppCompatActivity implements Asma2ElsewarAdapt
         mDBHelper = new DataBaseHelper(this);
       Log.d("stop after query","msg");
         // check exists Database
-        File database = getApplicationContext().getDatabasePath(DataBaseHelper.DBNAME);
+       /* File database = getApplicationContext().getDatabasePath(DataBaseHelper.DBNAME);
         if(false == database.exists()) {
             mDBHelper.getReadableDatabase();
             //Copy db
@@ -96,15 +90,14 @@ public class MainActivity extends AppCompatActivity implements Asma2ElsewarAdapt
                 return;
             }
         }
-        aya =  mDBHelper.getaya(1,1);
+*/
+        mSewarNames =  DataBaseHelper.suraNames();
 
-        mnames =  mDBHelper.suraNames();
-
-               /*
+        /*
          * Using findViewById, we get a reference to our RecyclerView from xml. This allows us to
          * do things like set the adapter of the RecyclerView and toggle the visibility.
          */
-        mNumbersList = (RecyclerView) findViewById(R.id.rv_numbers);
+        mSewarList= findViewById(R.id.namesOfsewar);
 
     /*
      * A LinearLayoutManager is responsible for measuring and positioning item views within a
@@ -115,20 +108,19 @@ public class MainActivity extends AppCompatActivity implements Asma2ElsewarAdapt
      * the LinearLayoutManager constructor.
      */
         LinearLayoutManager layoutManager = new LinearLayoutManager(this);
-        mNumbersList.setLayoutManager(layoutManager);
+        mSewarList.setLayoutManager(layoutManager);
 
         /*
          * Use this setting to improve performance if you know that changes in content do not
          * change the child layout size in the RecyclerView
          */
-        mNumbersList.setHasFixedSize(true);
-        // COMPLETED (13) Pass in this as the ListItemClickListener to the Asma2ElsewarAdapter constructor
+        mSewarList.setHasFixedSize(true);
+        //Pass in this as the ListItemClickListener to the Asma2ElsewarAdapter constructor
         /*
          * The Asma2ElsewarAdapter is responsible for displaying each item in the list.
          */
-        // mAdapter = new Asma2ElsewarAdapter(NUM_LIST_ITEMS,mCursor,this,messages);
-        mAdapter = new Asma2ElsewarAdapter(NUM_LIST_ITEMS,mCursor,this,mnames);
-        mNumbersList.setAdapter(mAdapter);
+        mAdapter = new Asma2ElsewarAdapter(NUM_LIST_ITEMS,this,mSewarNames);
+        mSewarList.setAdapter(mAdapter);
 
 
         //-------------------------------------------------------------------
@@ -259,9 +251,7 @@ public class MainActivity extends AppCompatActivity implements Asma2ElsewarAdapt
                             MY_PERMISSIONS_REQUEST_WRITE_STORAGE);
                 }
             } else writeGranted = true;
-            if (audioGranted  && writeGranted)
-                return true;
-            else return false;
+            return audioGranted && writeGranted;
         } else
                 return true;
     }
@@ -351,7 +341,7 @@ public class MainActivity extends AppCompatActivity implements Asma2ElsewarAdapt
     }
 
 
-    private boolean copyDatabase(Context context) {
+   /* private boolean copyDatabase(Context context) {
         try {
 
             InputStream inputStream = context.getAssets().open(DataBaseHelper.DBNAME);
@@ -370,7 +360,7 @@ public class MainActivity extends AppCompatActivity implements Asma2ElsewarAdapt
             e.printStackTrace();
             return false;
         }
-    }
+    }*/
 
 }
 
