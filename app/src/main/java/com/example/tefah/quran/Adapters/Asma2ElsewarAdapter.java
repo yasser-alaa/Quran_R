@@ -18,8 +18,7 @@ import java.util.List;
 public class Asma2ElsewarAdapter extends RecyclerView.Adapter<Asma2ElsewarAdapter.NumberViewHolder> {
 
     private static final String TAG = Asma2ElsewarAdapter.class.getSimpleName();
-    private List<String> messages;
-    private Cursor mCursor;
+    private List<String> sewarNames;
 
     // Create a final private ListItemClickListener called mOnClickListener
     /*
@@ -50,14 +49,13 @@ public class Asma2ElsewarAdapter extends RecyclerView.Adapter<Asma2ElsewarAdapte
      * @param numberOfItems Number of items to display in list
      * @param listener Listener for list item clicks
      */
-    public Asma2ElsewarAdapter(int numberOfItems, Cursor cursor , ListItemClickListener listener , List<String> l) {
+    public Asma2ElsewarAdapter(int numberOfItems, ListItemClickListener listener , List<String> l) {
         mNumberItems = numberOfItems;
         mOnClickListener = listener;
         viewHolderCount = 0;
 
         // messages if we want to send list of strings instead of getting strings from database
-        messages = l ;
-        mCursor = cursor;
+        sewarNames = l ;
     }
 
     /**
@@ -156,8 +154,9 @@ public class Asma2ElsewarAdapter extends RecyclerView.Adapter<Asma2ElsewarAdapte
          * @param listIndex Position of the item in the list
          */
         void bind(int listIndex) {
-            listItemNumberView.setText(messages.get(listIndex));
+
             position = listIndex;
+            listItemNumberView.setText(sewarNames.get(listIndex));
         }
 
 

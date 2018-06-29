@@ -109,7 +109,7 @@ public class MainActivity extends AppCompatActivity implements Asma2ElsewarAdapt
         LinearLayoutManager layoutManager = new LinearLayoutManager(this);
         mNumbersList.setLayoutManager(layoutManager);
         mNumbersList.setHasFixedSize(true);
-        mAdapter = new Asma2ElsewarAdapter(NUM_LIST_ITEMS,mCursor,this,mnames);
+        mAdapter = new Asma2ElsewarAdapter(NUM_LIST_ITEMS,this,mnames);
         mNumbersList.setAdapter(mAdapter);
 
         voiceRecorder.setOnTouchListener(new View.OnTouchListener() {
@@ -222,9 +222,13 @@ public class MainActivity extends AppCompatActivity implements Asma2ElsewarAdapt
             public void onResponse(Call<ResponseBody> call,
                                    Response<ResponseBody> response) {
                 try {
+                    String returned = response.body().string();
                     Log.i("POST REQUEST", response.body().string());
-                    Toast.makeText(MainActivity.this, response.body().string(), Toast.LENGTH_LONG)
-                            .show();
+
+                    //todo should checkif the return didn't fail
+                    Intent intent = new Intent(MainActivity.this, Main2Activity.class);
+                    intent.putExtra(getString(R.string.aya_returned), returned);
+                    startActivity(intent);
                 } catch (IOException e) {
                     e.printStackTrace();
                 }
