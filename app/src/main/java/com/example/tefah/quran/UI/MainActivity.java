@@ -251,11 +251,14 @@ public class MainActivity extends AppCompatActivity implements Asma2ElsewarAdapt
                                    Response<ResponseBody> response) {
                 try {
                     String returned = response.body().string();
-                    Log.i("POST REQUEST", response.body().string());
+                    int suraNumber = Integer.valueOf(returned.split("-")[0]);
+                    int ayaNumber = Integer.valueOf(returned.split("-")[1]);
+                    Log.i("POST REQUEST", suraNumber + "-" + ayaNumber);
 
                     //todo should checkif the return didn't fail
                     Intent intent = new Intent(MainActivity.this, Main2Activity.class);
-                    intent.putExtra(getString(R.string.aya_returned), returned);
+                    intent.putExtra(getString(R.string.aya_returned), ayaNumber);
+                    intent.putExtra(getString(R.string.sura_returned), suraNumber);
                     startActivity(intent);
                 } catch (IOException e) {
                     e.printStackTrace();
@@ -366,26 +369,6 @@ public class MainActivity extends AppCompatActivity implements Asma2ElsewarAdapt
     }
 
 
-   /* private boolean copyDatabase(Context context) {
-        try {
-
-            InputStream inputStream = context.getAssets().open(DataBaseHelper.DBNAME);
-            String outFileName = DataBaseHelper.DBLOCATION + DataBaseHelper.DBNAME;
-            OutputStream outputStream = new FileOutputStream(outFileName);
-            byte[]buff = new byte[1024];
-            int length = 0;
-            while ((length = inputStream.read(buff)) > 0) {
-                outputStream.write(buff, 0, length);
-            }
-            outputStream.flush();
-            outputStream.close();
-            Log.w("MainActivity","DB copied");
-            return true;
-        }catch (Exception e) {
-            e.printStackTrace();
-            return false;
-        }
-    }*/
 
     @Override
     public void onSeekComplete(MediaPlayer mediaPlayer) {

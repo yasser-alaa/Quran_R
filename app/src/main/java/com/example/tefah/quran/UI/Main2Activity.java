@@ -35,6 +35,8 @@ public class Main2Activity extends AppCompatActivity {
     int startPagePosition;
     LayoutInflater inflater;    //Used to create individual pages
     ViewPager vp;               //Reference to class to swipe views
+    int sNumber;
+    int aNumber;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -75,6 +77,10 @@ public class Main2Activity extends AppCompatActivity {
 
         //get sura number that has been clicked
         Intent intent = getIntent();
+        if (intent.hasExtra(getString(R.string.aya_returned))){
+            aNumber = intent.getIntExtra(getString(R.string.aya_returned), 1);
+            sNumber = intent.getIntExtra(getString(R.string.sura_returned), 1);
+        }
         suraNumber = intent.getIntExtra(Intent.EXTRA_TEXT, 0);
         startPagePosition = suraList.get(suraNumber).getStartPage()-1;
         //get an inflater to be used to create single pages
