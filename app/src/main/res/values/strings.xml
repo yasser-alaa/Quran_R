@@ -4,4 +4,7 @@
     <string name="no_audio_recorded">no audio recorded</string>
     <string name="aya_returned">aya number</string>
     <string name="sura_returned">sura number from server</string>
+
+    <string name="time_exceeded">You are exceedeing limit voice recording</string>
+    <string name="uploading">Uploading the file...</string>
 </resources>

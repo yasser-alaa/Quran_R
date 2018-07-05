@@ -59,18 +59,21 @@ public class MainActivity extends AppCompatActivity implements Asma2ElsewarAdapt
     //------------------------------------------------
 
     public static final int MY_PERMISSIONS_REQUEST_RECORD_AUDIO = 100 ;
-     public static final int MY_PERMISSIONS_REQUEST_WRITE_STORAGE = 200 ;
-
+    public static final int MY_PERMISSIONS_REQUEST_WRITE_STORAGE = 200 ;
     private static  boolean RECODER_TIME_OK = false;
+    private static  boolean IS_TOO_MUCH = false;
+
+
+
     private String audioPath;
     public MediaRecorder recorder;
     MediaPlayer player;
-    private CountDownTimer timer;
+    private CountDownTimer minTimer;
+    private CountDownTimer maxTimer;
+
 
 @BindView(R.id.voice_recorder)
     FloatingActionButton voiceRecorder;
-@BindView(R.id.test_player)
-    FloatingActionButton testPlayer;
 
     @SuppressLint("ClickableViewAccessibility")
     @Override
@@ -84,59 +87,15 @@ public class MainActivity extends AppCompatActivity implements Asma2ElsewarAdapt
       Log.d("stop after query","msg");
         // check exists Database
 
-       /* File database = getApplicationContext().getDatabasePath(DataBaseHelper.DBNAME);
-        if(false == database.exists()) {
->>>>>>> 2bebaf353913428ff9950f4986c3560c2c2aed73:app/src/main/java/com/example/tefah/quran/MainActivity.java
-            mDBHelper.getReadableDatabase();
-            //Copy db
-            if(copyDatabase(this)) {
-                Toast.makeText(this, "Copy database succes", Toast.LENGTH_SHORT).show();
-            } else {
-                Toast.makeText(this, "Copy data error", Toast.LENGTH_SHORT).show();
-                return;
-            }
-        }
-<<<<<<< HEAD:app/src/main/java/com/example/tefah/quran/UI/MainActivity.java
-        aya =  mDBHelper.getaya(1,1);
-        mnames =  mDBHelper.suraNames();
-
-        mNumbersList = findViewById(R.id.rv_numbers);
-
-        LinearLayoutManager layoutManager = new LinearLayoutManager(this);
-        mNumbersList.setLayoutManager(layoutManager);
-        mNumbersList.setHasFixedSize(true);
-        mAdapter = new Asma2ElsewarAdapter(NUM_LIST_ITEMS,this,mnames);
-        mNumbersList.setAdapter(mAdapter);
-=======
-*/
         mSewarNames =  DataBaseHelper.suraNames();
 
-        /*
-         * Using findViewById, we get a reference to our RecyclerView from xml. This allows us to
-         * do things like set the adapter of the RecyclerView and toggle the visibility.
-         */
         mSewarList= findViewById(R.id.namesOfsewar);
 
-    /*
-     * A LinearLayoutManager is responsible for measuring and positioning item views within a
-     * RecyclerView into a linear list. This means that it can produce either a horizontal or
-     * vertical list depending on which parameter you pass in to the LinearLayoutManager
-     * constructor. By default, if you don't specify an orientation, you get a vertical list.
-     * In our case, we want a vertical list, so we don't need to pass in an orientation flag to
-     * the LinearLayoutManager constructor.
-     */
+
         LinearLayoutManager layoutManager = new LinearLayoutManager(this);
         mSewarList.setLayoutManager(layoutManager);
 
-        /*
-         * Use this setting to improve performance if you know that changes in content do not
-         * change the child layout size in the RecyclerView
-         */
         mSewarList.setHasFixedSize(true);
-        //Pass in this as the ListItemClickListener to the Asma2ElsewarAdapter constructor
-        /*
-         * The Asma2ElsewarAdapter is responsible for displaying each item in the list.
-         */
         mAdapter = new Asma2ElsewarAdapter(NUM_LIST_ITEMS,this,mSewarNames);
         mSewarList.setAdapter(mAdapter);
 
@@ -155,6 +114,11 @@ public class MainActivity extends AppCompatActivity implements Asma2ElsewarAdapt
                     case MotionEvent.ACTION_UP:
                         if (RECODER_TIME_OK) {
                             Utils.stopRecording(recorder);
+                            if (audioPath != null) {
+                                Toast.makeText(MainActivity.this, getString(R.string.uploading), Toast.LENGTH_SHORT)
+                                        .show();
+                                uploadFile();
+                            }
                         } else {
                             recordStopSound();
                             Toast.makeText(MainActivity.this, "Hold to record voice",
@@ -162,7 +126,8 @@ public class MainActivity extends AppCompatActivity implements Asma2ElsewarAdapt
                             recorder.release();
                             recorder = null;
                         }
-                        timer.cancel();
+                        minTimer.cancel();
+                        maxTimer.cancel();
                         RECODER_TIME_OK = false;
                         break;
                     default:
@@ -207,7 +172,7 @@ public class MainActivity extends AppCompatActivity implements Asma2ElsewarAdapt
 
     private void record() {
         audioPath = Utils.startRecording(recorder);
-        timer = new CountDownTimer(2000, 1000) {
+        minTimer =  new CountDownTimer(2000, 1000) {
 
             public void onTick(long millisUntilFinished) {
             }
@@ -216,14 +181,24 @@ public class MainActivity extends AppCompatActivity implements Asma2ElsewarAdapt
                 RECODER_TIME_OK = true;
             }
         }.start();
-    }
+        maxTimer = new CountDownTimer(20000, 1000) {
+            @Override
+            public void onTick(long l) {
 
-    @OnClick(R.id.test_player)
-    public void play(){
-        if (audioPath != null)
-            uploadFile();
-        else
-            Toast.makeText(this, getString(R.string.no_audio_recorded), Toast.LENGTH_SHORT).show();
+            }
+
+            @Override
+            public void onFinish() {
+                Toast.makeText(MainActivity.this, getString(R.string.time_exceeded), Toast.LENGTH_SHORT)
+                        .show();
+                Toast.makeText(MainActivity.this, getString(R.string.uploading), Toast.LENGTH_SHORT)
+                        .show();
+                Utils.stopRecording(recorder);
+                if (audioPath != null)
+                    uploadFile();
+            }
+        }.start();
+
     }
 
     private void uploadFile() {
@@ -260,6 +235,8 @@ public class MainActivity extends AppCompatActivity implements Asma2ElsewarAdapt
                     intent.putExtra(getString(R.string.aya_returned), ayaNumber);
                     intent.putExtra(getString(R.string.sura_returned), suraNumber);
                     startActivity(intent);
+                    Log.i("POST REQUEST", response.body().string());
+
                 } catch (IOException e) {
                     e.printStackTrace();
                 }
