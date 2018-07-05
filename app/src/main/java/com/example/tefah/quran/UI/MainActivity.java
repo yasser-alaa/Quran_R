@@ -112,6 +112,8 @@ public class MainActivity extends AppCompatActivity implements Asma2ElsewarAdapt
                         }
                         break;
                     case MotionEvent.ACTION_UP:
+                        if (IS_TOO_MUCH)
+                            break;
                         if (RECODER_TIME_OK) {
                             Utils.stopRecording(recorder);
                             if (audioPath != null) {
@@ -171,6 +173,7 @@ public class MainActivity extends AppCompatActivity implements Asma2ElsewarAdapt
     }
 
     private void record() {
+        IS_TOO_MUCH = false;
         audioPath = Utils.startRecording(recorder);
         minTimer =  new CountDownTimer(2000, 1000) {
 
@@ -189,13 +192,17 @@ public class MainActivity extends AppCompatActivity implements Asma2ElsewarAdapt
 
             @Override
             public void onFinish() {
+                IS_TOO_MUCH = true;
+
                 Toast.makeText(MainActivity.this, getString(R.string.time_exceeded), Toast.LENGTH_SHORT)
                         .show();
-                Toast.makeText(MainActivity.this, getString(R.string.uploading), Toast.LENGTH_SHORT)
-                        .show();
+
                 Utils.stopRecording(recorder);
-                if (audioPath != null)
+                if (audioPath != null) {
                     uploadFile();
+                    Toast.makeText(MainActivity.this, getString(R.string.uploading), Toast.LENGTH_SHORT)
+                            .show();
+                }
             }
         }.start();
 
