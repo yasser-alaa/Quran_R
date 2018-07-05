@@ -25,20 +25,5 @@
         app:pressedTranslationZ="@dimen/fab_press_translation_z"
         android:contentDescription="@string/record_voice"
         />
-    <android.support.design.widget.FloatingActionButton
-        android:id="@+id/test_player"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginBottom="48dp"
-        android:layout_marginStart="24dp"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintLeft_toLeftOf="parent"
-        android:src="@android:drawable/ic_media_play"
-        app:fabSize="mini"
-        android:elevation="@dimen/fab_elevation"
-        app:pressedTranslationZ="@dimen/fab_press_translation_z"
-        android:layout_gravity="bottom|end"
-        android:contentDescription="@string/record_voice"
-        />
 
 </android.support.constraint.ConstraintLayout>

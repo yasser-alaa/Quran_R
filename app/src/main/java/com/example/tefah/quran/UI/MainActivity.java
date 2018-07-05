@@ -66,18 +66,21 @@ public class MainActivity extends AppCompatActivity implements Asma2ElsewarAdapt
     //------------------------------------------------
 
     public static final int MY_PERMISSIONS_REQUEST_RECORD_AUDIO = 100 ;
-     public static final int MY_PERMISSIONS_REQUEST_WRITE_STORAGE = 200 ;
-
+    public static final int MY_PERMISSIONS_REQUEST_WRITE_STORAGE = 200 ;
     private static  boolean RECODER_TIME_OK = false;
+    private static  boolean IS_TOO_MUCH = false;
+
+
+
     private String audioPath;
     public MediaRecorder recorder;
     MediaPlayer player;
-    private CountDownTimer timer;
+    private CountDownTimer minTimer;
+    private CountDownTimer maxTimer;
+
 
 @BindView(R.id.voice_recorder)
     FloatingActionButton voiceRecorder;
-@BindView(R.id.test_player)
-    FloatingActionButton testPlayer;
 
     @SuppressLint("ClickableViewAccessibility")
     @Override
@@ -127,6 +130,11 @@ public class MainActivity extends AppCompatActivity implements Asma2ElsewarAdapt
                     case MotionEvent.ACTION_UP:
                         if (RECODER_TIME_OK) {
                             Utils.stopRecording(recorder);
+                            if (audioPath != null) {
+                                Toast.makeText(MainActivity.this, getString(R.string.uploading), Toast.LENGTH_SHORT)
+                                        .show();
+                                uploadFile();
+                            }
                         } else {
                             recordStopSound();
                             Toast.makeText(MainActivity.this, "Hold to record voice",
@@ -134,7 +142,8 @@ public class MainActivity extends AppCompatActivity implements Asma2ElsewarAdapt
                             recorder.release();
                             recorder = null;
                         }
-                        timer.cancel();
+                        minTimer.cancel();
+                        maxTimer.cancel();
                         RECODER_TIME_OK = false;
                         break;
                     default:
@@ -179,7 +188,7 @@ public class MainActivity extends AppCompatActivity implements Asma2ElsewarAdapt
 
     private void record() {
         audioPath = Utils.startRecording(recorder);
-        timer = new CountDownTimer(2000, 1000) {
+        minTimer =  new CountDownTimer(2000, 1000) {
 
             public void onTick(long millisUntilFinished) {
             }
@@ -188,14 +197,24 @@ public class MainActivity extends AppCompatActivity implements Asma2ElsewarAdapt
                 RECODER_TIME_OK = true;
             }
         }.start();
-    }
+        maxTimer = new CountDownTimer(20000, 1000) {
+            @Override
+            public void onTick(long l) {
 
-    @OnClick(R.id.test_player)
-    public void play(){
-        if (audioPath != null)
-            uploadFile();
-        else
-            Toast.makeText(this, getString(R.string.no_audio_recorded), Toast.LENGTH_SHORT).show();
+            }
+
+            @Override
+            public void onFinish() {
+                Toast.makeText(MainActivity.this, getString(R.string.time_exceeded), Toast.LENGTH_SHORT)
+                        .show();
+                Toast.makeText(MainActivity.this, getString(R.string.uploading), Toast.LENGTH_SHORT)
+                        .show();
+                Utils.stopRecording(recorder);
+                if (audioPath != null)
+                    uploadFile();
+            }
+        }.start();
+
     }
 
     private void uploadFile() {
@@ -223,8 +242,6 @@ public class MainActivity extends AppCompatActivity implements Asma2ElsewarAdapt
                                    Response<ResponseBody> response) {
                 try {
                     Log.i("POST REQUEST", response.body().string());
-                    Toast.makeText(MainActivity.this, response.body().string(), Toast.LENGTH_LONG)
-                            .show();
                 } catch (IOException e) {
                     e.printStackTrace();
                 }
