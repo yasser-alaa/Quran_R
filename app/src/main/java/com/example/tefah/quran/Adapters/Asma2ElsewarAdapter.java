@@ -119,6 +119,7 @@ public class Asma2ElsewarAdapter extends RecyclerView.Adapter<Asma2ElsewarAdapte
     @Override
     public int getItemCount() {
         //return mCursor.getCount();
+        //we know the number of items wil be displayed (114 sura)
         return mNumberItems;
     }
 
@@ -131,7 +132,7 @@ public class Asma2ElsewarAdapter extends RecyclerView.Adapter<Asma2ElsewarAdapte
         // Will display the position in the list, ie 0 through getItemCount() - 1
         TextView listItemNumberView;
         // Will display which ViewHolder is displaying this data
-        TextView viewHolderIndex;
+
         int position;
 
         /**
@@ -145,7 +146,6 @@ public class Asma2ElsewarAdapter extends RecyclerView.Adapter<Asma2ElsewarAdapte
             super(itemView);
 
             listItemNumberView = (TextView) itemView.findViewById(R.id.tv_item_number);
-            viewHolderIndex = (TextView) itemView.findViewById(R.id.tv_view_holder_instance);
             //  Call setOnClickListener on the View passed into the constructor (use 'this' as the OnClickListener)
             itemView.setOnClickListener(this);
         }

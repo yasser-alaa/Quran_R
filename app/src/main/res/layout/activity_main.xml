@@ -6,10 +6,37 @@
     android:layout_height="match_parent"
     tools:context="com.example.tefah.quran.UI.MainActivity">
 
+    <EditText
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        app:layout_constraintVertical_weight="1"
+        app:layout_constraintHorizontal_weight="6"
+        android:id="@+id/search_edit_text"
+        app:layout_constraintBottom_toTopOf="@id/namesOfsewar"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintRight_toLeftOf="@id/search_button"
+        app:layout_constraintLeft_toLeftOf="parent"
+        android:hint="write ayah here then click button"/>
+    <Button
+        android:layout_width="0dp"
+        app:layout_constraintHorizontal_weight="1"
+        android:layout_height="0dp"
+        android:text="search"
+        android:id="@+id/search_button"
+        app:layout_constraintBottom_toTopOf="@id/namesOfsewar"
+        app:layout_constraintLeft_toRightOf="@id/search_edit_text"
+        app:layout_constraintRight_toRightOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        android:onClick="onSearch"/>
+
     <android.support.v7.widget.RecyclerView
         android:id="@+id/namesOfsewar"
         android:layout_width="match_parent"
-        android:layout_height="match_parent"/>
+        android:layout_height="0dp"
+        app:layout_constraintVertical_weight="7"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/search_edit_text"
+        />
 
     <android.support.design.widget.FloatingActionButton
         android:id="@+id/voice_recorder"

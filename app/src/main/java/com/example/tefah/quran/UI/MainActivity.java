@@ -20,6 +20,8 @@ import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 import android.view.MotionEvent;
 import android.view.View;
+import android.widget.Button;
+import android.widget.EditText;
 import android.widget.Toast;
 
 import com.example.tefah.quran.R;
@@ -74,6 +76,10 @@ public class MainActivity extends AppCompatActivity implements Asma2ElsewarAdapt
 
 @BindView(R.id.voice_recorder)
     FloatingActionButton voiceRecorder;
+    @BindView(R.id.search_edit_text)
+    EditText searchEditText;
+    Button searchButton;
+
 
     @SuppressLint("ClickableViewAccessibility")
     @Override
@@ -346,10 +352,19 @@ public class MainActivity extends AppCompatActivity implements Asma2ElsewarAdapt
         // String nameOfSura = messages.get(clickedItemIndex);
 
         Intent startChildActivityIntent = new Intent(context, Main2Activity.class);
-        startChildActivityIntent.putExtra(Intent.EXTRA_TEXT,clickedItemIndex);
+        startChildActivityIntent.putExtra(Intent.EXTRA_INDEX, clickedItemIndex);
 
         startActivity(startChildActivityIntent);
 
+    }
+
+    public void onSearch(View view) {
+        //get text from searchEditText when click button
+        String AyaWrittenInSearchBox = searchEditText.getText().toString();
+        Context context = MainActivity.this;
+        Intent startChildActivityIntent = new Intent(context, Main2Activity.class);
+        startChildActivityIntent.putExtra(Intent.EXTRA_TEXT, AyaWrittenInSearchBox);
+        startActivity(startChildActivityIntent);
     }
 
 

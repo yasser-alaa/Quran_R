@@ -1,5 +1,9 @@
 package com.example.tefah.quran.data;
 
+/**
+ * Created by yasseralaa on 03/07/18.
+ */
+
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.database.Cursor;
@@ -8,7 +12,9 @@ import android.database.sqlite.SQLiteOpenHelper;
 import android.preference.PreferenceManager;
 import android.util.Log;
 
-import com.example.tefah.quran.QuranInfo.*;
+import com.example.tefah.quran.QuranInfo.Aya;
+import com.example.tefah.quran.QuranInfo.Page;
+import com.example.tefah.quran.QuranInfo.Sura;
 
 import java.io.File;
 import java.io.FileOutputStream;
@@ -20,20 +26,22 @@ import java.util.List;
 
 import static android.content.ContentValues.TAG;
 
+
+
 /**
  * Created by yasseralaa on 17/06/18.
  */
 
-public class DataBaseHelper extends SQLiteOpenHelper {
+public class DataBaseHelper2 extends SQLiteOpenHelper {
 
-    public static final String DBNAME = "quran.sqlite";
+    public static final String DBNAME = "simplee.sqlite";
     private static final int DATABASE_VERSION = 2;
     private static final String SP_KEY_DB_VER = "db_ver";
     public static final String DBLOCATION = "/data/data/com.example.tefah.quran/databases/";
     private Context mContext;
     private SQLiteDatabase mDatabase;
 
-    public DataBaseHelper(Context context) {
+    public DataBaseHelper2(Context context) {
         super(context, DBNAME, null, 3);
         this.mContext = context;
         initialize();
@@ -149,25 +157,14 @@ public class DataBaseHelper extends SQLiteOpenHelper {
         return ayaText;
     }
 
-    public int getSuraNumber(int idOfSura){
-        int suraNum=0;
-        openDatabase();
-        Cursor cursor = mDatabase.rawQuery("select sura from quran_text where id = "+ idOfSura,null);
-        cursor.moveToFirst();
-        suraNum =  cursor.getInt(0);
-        cursor.close();
-        closeDatabase();
-        return suraNum;
-    }
-
-
     public List<Aya> getListOfAyas() {
         List<Aya> ayaList = new ArrayList<>();
         openDatabase();
-        Cursor cursor = mDatabase.rawQuery("SELECT text FROM quran_text ", null);
+        Cursor cursor = mDatabase.rawQuery("SELECT text FROM quran_simple ", null);
         cursor.moveToFirst();
         int counter = 0;
         while (!cursor.isAfterLast()) {
+
             ayaList.add(new Aya(cursor.getString(cursor.getColumnIndex("text")), counter));
             counter++;
             cursor.moveToNext();
@@ -310,14 +307,12 @@ public class DataBaseHelper extends SQLiteOpenHelper {
 
     }
 
-    public List<Page> getListOfpages() {
-
+    /*public List<Page> getListOfpages() {
         List<Page> pageList = new ArrayList<>();
         openDatabase();
         Cursor cursor = mDatabase.rawQuery("SELECT * FROM Book2 ", null);
         cursor.moveToFirst();
         while (!cursor.isAfterLast()) {
-
             pageList.add(new Page(cursor.getInt(cursor.getColumnIndex("aya")), cursor.getInt(cursor.getColumnIndex("page")), cursor.getInt(cursor.getColumnIndex("sura"))));
             cursor.moveToNext();
         }
@@ -325,69 +320,121 @@ public class DataBaseHelper extends SQLiteOpenHelper {
         closeDatabase();
         return pageList;
     }
-
-    public List<Sura> getListOfSewar() {
-        List<Sura> suraList = new ArrayList<>();
-        openDatabase();
-        Cursor cursorAyatCount = mDatabase.rawQuery("select max(aya) from quran_text" +
-                " group by sura ", null);
-        cursorAyatCount.moveToFirst();
-        while (!cursorAyatCount.isAfterLast()) {
-            //calc. number of ayat fe kol sura
-            suraList.add(new Sura(cursorAyatCount.getInt(0), cursorAyatCount.getPosition()));
-            cursorAyatCount.moveToNext();
-        }
-        cursorAyatCount.close();
-
-        //set start page of every sura
-        int counter = 0;       //counter that accessing the sewar list
-        int startPageNumber, suraNum;
-        //specific case of fateha
-        suraList.get(counter).setStartPage(1);
-
-        counter++;
-        Cursor cursorStartPage = mDatabase.rawQuery("select page,sura from Book2 group by sura ", null);
-        cursorStartPage.moveToFirst();
-        while (!cursorStartPage.isAfterLast()) {
-            if (counter != 114) {
-                suraNum = cursorStartPage.getInt(1);
-
-                startPageNumber = cursorStartPage.getInt(0) + 1;
-
-                suraList.get(counter).setStartPage(startPageNumber);
-                cursorStartPage.moveToNext();
-                if(!cursorStartPage.isAfterLast()){
-                    if((cursorStartPage.getInt(1) - suraNum) != 1) {
-                        // kam sura fatet fe el nos (have same start page)
-                        for (; counter < cursorStartPage.getInt(1); counter++) {
-                            suraList.get(counter).setStartPage(startPageNumber);
-                        }
-                    }
-                }
-                counter++;
-            }
-            else {
-                Log.d("maynf3sh kda", "el counter 3ada el 114");
-            }
-        }
-        cursorStartPage.close();
-        closeDatabase();
-       /* first we get all ayat of quran
-         we want to store each list of ayat in each sura
-        one big forloop for number of sewar
-         one small loop for ayat in every sura*/
-        List<Aya> allOfAyat = getListOfAyas();
-        int ayahCounter = 0;     // da el pointer of ely hymshy 3la ayat el quran kolha 3ashan
-        // y7othm fe list el ayat ely fe kol sora
-        int suraNumOfAyat;
-        for (int i = 0; i < 114; i++) {
-            suraNumOfAyat = suraList.get(i).getayatCount();  //number of ayat in sura
-            for (int j = 0; j < suraNumOfAyat; j++) {
-                suraList.get(i). //el sura
-                        setListOfAyat(allOfAyat.get(ayahCounter));
-                ayahCounter++;
-            }
-        }
-        return suraList;
-    }
+*/
+//    public List<Sura> getListOfSewar() {
+//        List<Sura> suraList = new ArrayList<>();
+//        openDatabase();
+//        Cursor cursorAyatCount = mDatabase.rawQuery("select max(aya) from quran_text" +
+//                " group by sura ", null);
+//        cursorAyatCount.moveToFirst();
+//        while (!cursorAyatCount.isAfterLast()) {
+//            //calc. number of ayat fe kol sura
+//            suraList.add(new Sura(cursorAyatCount.getInt(0), cursorAyatCount.getPosition()));
+//            cursorAyatCount.moveToNext();
+//        }
+//        cursorAyatCount.close();
+//
+//        /*
+//        //set end page of every sura
+//        */
+//        int counter = 0;       //counter that accessing the sewar list
+//        int endPageNumber=604, suraNum;
+//        //specific case of fateha
+//        suraList.get(counter).setStartPage(1);
+//        suraList.get(counter).setEndPage(1);
+//
+//        // counter++;
+//        // store end pages of sewar
+//        Cursor cursorEndPage = mDatabase.rawQuery("select page,sura from Book2 group by sura ", null);
+//        cursorEndPage.moveToFirst();
+//        while (!cursorEndPage.isAfterLast()) {
+//            if (counter != 114) {
+//                suraNum = cursorEndPage.getInt(1);  //el rakam el sa7e7 ely fel quran
+//                endPageNumber = cursorEndPage.getInt(0);
+//
+//                suraList.get(counter).setEndPage(endPageNumber);
+//                cursorEndPage.moveToNext();
+//                //check if there are sewar fe el nos has same end page
+//                if(!cursorEndPage.isAfterLast()){
+//                    if((cursorEndPage.getInt(1) - suraNum) == 2) {
+//                        // kam sura fatet fe el nos (have same end page)>>assign to them the same end page num
+//                        counter++;
+//                        suraList.get(counter).setEndPage(endPageNumber);
+//                    }
+//                    else if((cursorEndPage.getInt(1) - suraNum) == 3){
+//                        counter++;
+//                        suraList.get(counter).setEndPage(endPageNumber);
+//                        counter++;
+//                        suraList.get(counter).setEndPage(endPageNumber);
+//                    }
+//                    counter++;
+//
+//                }
+//            }
+//        }
+//        counter++;
+//        suraList.get(counter).setEndPage(endPageNumber);
+//        counter++;
+//        suraList.get(counter).setEndPage(endPageNumber);
+//        cursorEndPage.close();
+//        closeDatabase();
+//        /*
+//        *calc start page
+//        * then store them in suraList */
+//        List<Page> pageList = getListOfpages();
+//        int startAyahOfNextPage =0 ,currentSuraEndPageNumber,nextSuraEndPageNumber ,nextSuraStartPageNumber=0;
+//        for(int i =0;i<113;i++){
+//            //law el soraten m3ndhmsh nafs el endpage yb2a aked homa msh m3 b3d fe nafs el page
+//            // zay el baqra w 2al 3mran
+//            currentSuraEndPageNumber = suraList.get(i).getEndPage();
+//            nextSuraEndPageNumber = suraList.get(i+1).getEndPage();
+//            if(i==85){//sura el a3la
+//                Log.d("CRASH","msh by3rd 7aga fe el do7a , crach");
+//            }
+//            if((currentSuraEndPageNumber+1) < 604){  //3ashan ama yewsl le a5r page
+//                startAyahOfNextPage = pageList.get(currentSuraEndPageNumber).getPageStartAyahNumber();
+//            }
+//
+//            if(currentSuraEndPageNumber != nextSuraEndPageNumber){
+//                 /*case 1 :
+//                *   sura ends and the next start at the new page*/
+//                if(startAyahOfNextPage == 1){
+//                    nextSuraStartPageNumber = currentSuraEndPageNumber+1;
+//                    suraList.get(i+1).setStartPage(nextSuraStartPageNumber);
+//                }
+//            /*case 2 :
+//            * sura ends then the next starts and ends in another page
+//            * zay el ma2da maslan*/
+//                else{
+//                    nextSuraStartPageNumber = currentSuraEndPageNumber;
+//                    suraList.get(i+1).setStartPage(nextSuraStartPageNumber);
+//                }
+//            }
+//             /*case 3 :
+//            * sura ends then the next starts and ends in the same page
+//            * zay el do7a w el shar7*/
+//            else if(currentSuraEndPageNumber == nextSuraEndPageNumber){
+//                nextSuraStartPageNumber = currentSuraEndPageNumber;
+//                suraList.get(i+1).setStartPage(nextSuraStartPageNumber);
+//            }
+//        }
+//
+//       /* first we get all ayat of quran
+//         we want to store each list of ayat in each sura
+//        one big forloop for number of sewar
+//         one small loop for ayat in every sura*/
+//        List<Aya> allOfAyat = getListOfAyas();
+//        int ayahCounter = 0;     // da el pointer of ely hymshy 3la ayat el quran kolha 3ashan
+//        // y7othm fe list el ayat ely fe kol sora
+//        int suraNumOfAyat;
+//        for (int i = 0; i < 114; i++) {
+//            suraNumOfAyat = suraList.get(i).getayatCount();  //number of ayat in sura
+//            for (int j = 0; j < suraNumOfAyat; j++) {
+//                suraList.get(i). //el sura
+//                        setListOfAyat(allOfAyat.get(ayahCounter));
+//                ayahCounter++;
+//            }
+//        }
+//        return suraList;
+//    }
 }
