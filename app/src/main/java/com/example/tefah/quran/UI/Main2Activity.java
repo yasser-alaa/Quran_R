@@ -2,6 +2,7 @@ package com.example.tefah.quran.UI;
 
 import android.content.Context;
 import android.content.Intent;
+import android.graphics.Typeface;
 import android.support.v4.view.PagerAdapter;
 import android.support.v4.view.ViewPager;
 import android.support.v7.app.AppCompatActivity;
@@ -14,10 +15,13 @@ import android.widget.Toast;
 
 import com.example.tefah.quran.QuranInfo.*;
 import com.example.tefah.quran.R;
+import com.example.tefah.quran.Utils;
 import com.example.tefah.quran.data.DataBaseHelper;
 import com.example.tefah.quran.data.DataBaseHelper2;
 
 import java.util.List;
+
+import okhttp3.internal.Util;
 
 public class Main2Activity extends AppCompatActivity {
     private int suraNumber;
@@ -47,12 +51,13 @@ public class Main2Activity extends AppCompatActivity {
         //get sura number that has been clicked
         Intent intent = getIntent();
         //get aya writen in searchBOX
-        /*
+        /**
          * algorithm
          * 1- get the text from editBOX
          * 2- search for the sequence
          *       if detected in ayah then add this aya to the result list
-         *       continue search till ayas end*/
+         *       continue search till ayas end
+         **/
         if(intent.hasExtra(Intent.EXTRA_TEXT)){
             mAyaSearched = intent.getStringExtra(Intent.EXTRA_TEXT);
             for(Aya ayaTemp : ayas){
@@ -89,10 +94,16 @@ public class Main2Activity extends AppCompatActivity {
         @Override
         public Object instantiateItem(ViewGroup container, int position) {
             final View page = inflater.inflate(R.layout.page, null);
+
+            Typeface custom_font = Typeface.createFromAsset(getAssets(),  "ZekrQuran.ttf");
             /*TODO (1)
             number of lines*/
             String pageTextDisplay = getPageTextDisplay(position);
-            ((TextView) (page.findViewById(R.id.ayatQuran))).setText(pageTextDisplay);
+            pageTextDisplay = Utils.translateNumbers(pageTextDisplay);
+            TextView ayatTV =  (TextView) (page.findViewById(R.id.ayatQuran));
+            ayatTV.setTypeface(custom_font);
+            ayatTV.setText(pageTextDisplay);
+//                    .setText(pageTextDisplay);
             //Add the page to the front of the queue
             ((ViewPager) container).addView(page, 0);
             return page;
