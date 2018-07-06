@@ -1,5 +1,6 @@
 package com.example.tefah.quran;
 
+import android.content.res.AssetFileDescriptor;
 import android.media.MediaPlayer;
 import android.media.MediaRecorder;
 import android.os.Environment;
@@ -22,6 +23,25 @@ class Utils {
      * @param recorder media recorder
      * @return the path of the audio file
      */
+    /**
+     * translate english numbers to arabic
+     * @param sora string with english numbers
+     * @return String sora with arabic numbers
+     */
+    public static String translateNumbers(String sora){
+        //translation of english numbers
+        char[] arabicChars = {'٠','١','٢','٣','٤','٥','٦','٧','٨','٩'};
+        StringBuilder builder = new StringBuilder();
+        for(int i =0;i<sora .length();i++) {
+            if(Character.isDigit(sora .charAt(i)))
+                builder.append(arabicChars[(int)(sora .charAt(i))-48]);
+            else
+                builder.append(sora .charAt(i));
+
+        }
+        return builder.toString();
+    }
+
     public static String startRecording(MediaRecorder recorder) {
         String savedAudioPath = null;
         File storageDir = mainStorageDir();
@@ -79,9 +99,13 @@ class Utils {
         return storageDir;
     }
 
-    public static void startPlaying(MediaPlayer player, String audioFileName, MediaPlayer.OnSeekCompleteListener listener) {
+    public static void startPlaying(MediaPlayer player, AssetFileDescriptor assetFileDescriptor,
+                                    MediaPlayer.OnSeekCompleteListener listener) {
         try {
-            player.setDataSource(audioFileName);
+            player.setDataSource(assetFileDescriptor.getFileDescriptor(),
+                    assetFileDescriptor.getStartOffset(),
+                    assetFileDescriptor.getLength());
+//            player.setDataSource(audioFileName);
             player.prepare();
             player.start();
             player.setOnSeekCompleteListener(listener);

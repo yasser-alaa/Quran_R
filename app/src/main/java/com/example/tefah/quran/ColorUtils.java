@@ -28,6 +28,7 @@ public class ColorUtils {
      * @return A shade of green based off of when the calling ViewHolder
      * was created.
      */
+
     public static int getViewHolderBackgroundColorFromInstance(Context context, int instanceNum) {
         switch (instanceNum) {
             case 0:

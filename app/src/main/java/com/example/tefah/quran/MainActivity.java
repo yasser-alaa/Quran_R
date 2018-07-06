@@ -5,6 +5,7 @@ import android.annotation.SuppressLint;
 import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
+import android.content.res.AssetFileDescriptor;
 import android.media.MediaPlayer;
 import android.media.MediaRecorder;
 import android.os.Build;
@@ -22,12 +23,14 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.Toast;
+import android.content.res.AssetFileDescriptor;
 
 import com.example.tefah.quran.Adapters.Asma2ElsewarAdapter;
 import com.example.tefah.quran.data.DataBaseHelper;
 
 import java.io.File;
 import java.io.FileOutputStream;
+import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.util.List;
@@ -43,13 +46,13 @@ import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
 
-public class MainActivity extends AppCompatActivity implements Asma2ElsewarAdapter.ListItemClickListener {
+public class MainActivity extends AppCompatActivity implements Asma2ElsewarAdapter.ListItemClickListener,MediaPlayer.OnSeekCompleteListener {
 
     //-------------------------------------------------
-    public static final int MY_PERMISSIONS_REQUEST_RECORDE_AUDIO = 100;
+    public static final int MY_PERMISSIONS_REQUEST_RECORD_AUDIO = 100 ;
+
     public static final int MY_PERMISSIONS_REQUEST_WRITE_STORAGE = 200;
     private static final int NUM_LIST_ITEMS = 114;
-    private static boolean RECODER_TIME_OK = false;
     public MediaRecorder recorder;
     //------------------------------------------------
     List<String> mSewarNames;
@@ -61,7 +64,10 @@ public class MainActivity extends AppCompatActivity implements Asma2ElsewarAdapt
     private Asma2ElsewarAdapter mAdapter;
     private RecyclerView mSewarList;
     private String audioPath;
-    private CountDownTimer timer;
+    private CountDownTimer minTimer;
+    private CountDownTimer maxTimer;
+    private static  boolean RECODER_TIME_OK = false;
+    private static  boolean IS_TOO_MUCH = false;
     @BindView(R.id.search_edit_text)
     EditText searchEditText;
     Button searchButton;
@@ -103,28 +109,37 @@ public class MainActivity extends AppCompatActivity implements Asma2ElsewarAdapt
         mSewarList.setAdapter(mAdapter);
         //-------------------------------------------------------------------
 
-//        it has a problem with accessability i can search for it later
         voiceRecorder.setOnTouchListener(new View.OnTouchListener() {
             @Override
             public boolean onTouch(View view, MotionEvent motionEvent) {
                 int action = motionEvent.getAction();
-                switch (action) {
+                switch (action){
                     case MotionEvent.ACTION_DOWN:
                         recorder = new MediaRecorder();
                         if (grantPermission()) {
+                            tennn();
                             record();
                         }
                         break;
                     case MotionEvent.ACTION_UP:
+                        if (IS_TOO_MUCH)
+                            break;
                         if (RECODER_TIME_OK) {
                             Utils.stopRecording(recorder);
+                            if (audioPath != null) {
+                                Toast.makeText(MainActivity.this, getString(R.string.uploading), Toast.LENGTH_SHORT)
+                                        .show();
+                                uploadFile();
+                            }
                         } else {
+                            recordStopSound();
                             Toast.makeText(MainActivity.this, "Hold to record voice",
                                     Toast.LENGTH_SHORT).show();
                             recorder.release();
                             recorder = null;
                         }
-                        timer.cancel();
+                        minTimer.cancel();
+                        maxTimer.cancel();
                         RECODER_TIME_OK = false;
                         break;
                     default:
@@ -135,9 +150,42 @@ public class MainActivity extends AppCompatActivity implements Asma2ElsewarAdapt
         });
     }
 
+    /**
+     * play sound to indicate something wrong with recording
+     */
+    private void recordStopSound() {
+        if (player != null){
+            onSeekComplete(player);
+        }
+        player = new MediaPlayer();
+        try {
+            AssetFileDescriptor assetFileDescriptor = getAssets().openFd("recorde_stop.mp3");
+            Utils.startPlaying(player, assetFileDescriptor, this);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+    /**
+     * play sound to indicate recording
+     */
+    private void tennn() {
+        if (player != null){
+            onSeekComplete(player);
+        }
+        player = new MediaPlayer();
+        try {
+            AssetFileDescriptor assetFileDescriptor = getAssets().openFd("recording.mp3");
+            Utils.startPlaying(player, assetFileDescriptor, this);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
     private void record() {
+        IS_TOO_MUCH = false;
         audioPath = Utils.startRecording(recorder);
-        timer = new CountDownTimer(2000, 1000) {
+        minTimer =  new CountDownTimer(2000, 1000) {
 
             public void onTick(long millisUntilFinished) {
             }
@@ -146,6 +194,28 @@ public class MainActivity extends AppCompatActivity implements Asma2ElsewarAdapt
                 RECODER_TIME_OK = true;
             }
         }.start();
+        maxTimer = new CountDownTimer(20000, 1000) {
+            @Override
+            public void onTick(long l) {
+
+            }
+
+            @Override
+            public void onFinish() {
+                IS_TOO_MUCH = true;
+
+                Toast.makeText(MainActivity.this, getString(R.string.time_exceeded), Toast.LENGTH_SHORT)
+                        .show();
+
+                Utils.stopRecording(recorder);
+                if (audioPath != null) {
+                    uploadFile();
+                    Toast.makeText(MainActivity.this, getString(R.string.uploading), Toast.LENGTH_SHORT)
+                            .show();
+                }
+            }
+        }.start();
+
     }
 
     @OnClick(R.id.test_player)
@@ -155,6 +225,7 @@ public class MainActivity extends AppCompatActivity implements Asma2ElsewarAdapt
         else
             Toast.makeText(this, getString(R.string.no_audio_recorded), Toast.LENGTH_SHORT).show();
     }
+
 
     private void uploadFile() {
         // create upload service client
@@ -171,12 +242,6 @@ public class MainActivity extends AppCompatActivity implements Asma2ElsewarAdapt
         MultipartBody.Part body =
                 MultipartBody.Part.createFormData("audio", file.getName(), requestFile);
 
-        // add another part within the multipart request
-        String descriptionString = "hello, this is description speaking";
-        RequestBody description =
-                RequestBody.create(
-                        okhttp3.MultipartBody.FORM, descriptionString);
-
         // finally, execute the request
         Call<ResponseBody> call = service.upload(body);
 
@@ -185,7 +250,23 @@ public class MainActivity extends AppCompatActivity implements Asma2ElsewarAdapt
             @Override
             public void onResponse(Call<ResponseBody> call,
                                    Response<ResponseBody> response) {
-//                Log.i("GET REQUEST", response.toString());
+                try {
+                    String returned = response.body().string();
+                    int suraNumber = Integer.valueOf(returned.split("-")[0]);
+                    int ayaNumber = Integer.valueOf(returned.split("-")[1]);
+                    Log.i("POST REQUEST", suraNumber + "-" + ayaNumber);
+
+                    //todo should checkif the return didn't fail
+                    Intent intent = new Intent(MainActivity.this, Main2Activity.class);
+                    intent.putExtra(getString(R.string.aya_returned), ayaNumber);
+                    intent.putExtra(getString(R.string.sura_returned), suraNumber);
+                    startActivity(intent);
+                    Log.i("POST REQUEST", response.body().string());
+
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+                Log.i("POST REQUEST", response.toString());
                 Log.v("Upload", "success");
             }
 
@@ -196,11 +277,11 @@ public class MainActivity extends AppCompatActivity implements Asma2ElsewarAdapt
         });
     }
 
-    public boolean grantPermission() {
+    public boolean grantPermission(){
         boolean audioGranted = false;
         boolean readGranted = false;
         boolean writeGranted = false;
-        if (Build.VERSION.SDK_INT >= 23) {
+        if(Build.VERSION.SDK_INT >= 23){
             if (ContextCompat.checkSelfPermission(this, Manifest.permission.RECORD_AUDIO)
                     != PackageManager.PERMISSION_GRANTED) {
                 // Permission is not granted
@@ -212,7 +293,7 @@ public class MainActivity extends AppCompatActivity implements Asma2ElsewarAdapt
                     // No explanation needed; request the permission
                     ActivityCompat.requestPermissions(this,
                             new String[]{Manifest.permission.RECORD_AUDIO},
-                            MY_PERMISSIONS_REQUEST_RECORDE_AUDIO);
+                            MY_PERMISSIONS_REQUEST_RECORD_AUDIO);
                 }
             } else audioGranted = true;
             if (ContextCompat.checkSelfPermission(this,
@@ -237,7 +318,7 @@ public class MainActivity extends AppCompatActivity implements Asma2ElsewarAdapt
     public void onRequestPermissionsResult(int requestCode,
                                            String permissions[], int[] grantResults) {
         switch (requestCode) {
-            case MY_PERMISSIONS_REQUEST_RECORDE_AUDIO: {
+            case MY_PERMISSIONS_REQUEST_RECORD_AUDIO: {
                 // If request is cancelled, the result arrays are empty.
                 if (grantResults.length > 0
                         && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
@@ -269,6 +350,18 @@ public class MainActivity extends AppCompatActivity implements Asma2ElsewarAdapt
         }
     }
 
+    @Override
+    public void onSeekComplete(MediaPlayer mediaPlayer) {
+        Utils.stopPlaying(mediaPlayer);
+    }
+
+    @Override
+    protected void onStop() {
+        super.onStop();
+        if (player != null) {
+            onSeekComplete(player);
+        }
+    }
     //Override ListItemClickListener's onListItemClick method
     /**
      * This is where we receive our callback from
