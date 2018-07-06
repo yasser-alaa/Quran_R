@@ -16,7 +16,6 @@ import java.util.List;
 /**
  * Created by yasseralaa on 15/05/18.
  */
-
 public class Asma2ElsewarAdapter extends RecyclerView.Adapter<Asma2ElsewarAdapter.NumberViewHolder> {
 
     private static final String TAG = Asma2ElsewarAdapter.class.getSimpleName();
@@ -106,6 +105,7 @@ public class Asma2ElsewarAdapter extends RecyclerView.Adapter<Asma2ElsewarAdapte
      */
     @Override
     public void onBindViewHolder(NumberViewHolder holder, int position) {
+
         Log.d(TAG, "#" + position);
         holder.bind(position);
     }
@@ -118,10 +118,11 @@ public class Asma2ElsewarAdapter extends RecyclerView.Adapter<Asma2ElsewarAdapte
      */
     @Override
     public int getItemCount() {
-        //return mCursor.getCount();
+
         //we know the number of items wil be displayed (114 sura)
         return mNumberItems;
     }
+    // Implement OnClickListener in the NumberViewHolder class
 
     /**
      * Cache of the children views for a list item.
@@ -131,9 +132,6 @@ public class Asma2ElsewarAdapter extends RecyclerView.Adapter<Asma2ElsewarAdapte
 
         // Will display the position in the list, ie 0 through getItemCount() - 1
         TextView listItemNumberView;
-        // Will display which ViewHolder is displaying this data
-
-        int position;
 
         /**
          * Constructor for our ViewHolder. Within this constructor, we get a reference to our
@@ -142,7 +140,9 @@ public class Asma2ElsewarAdapter extends RecyclerView.Adapter<Asma2ElsewarAdapte
          * @param itemView The View that you inflated in
          *                 {@link Asma2ElsewarAdapter#onCreateViewHolder(ViewGroup, int)}
          */
-        NumberViewHolder(View itemView) {
+
+        public NumberViewHolder(View itemView) {
+
             super(itemView);
 
             listItemNumberView = (TextView) itemView.findViewById(R.id.tv_item_number);
@@ -157,11 +157,8 @@ public class Asma2ElsewarAdapter extends RecyclerView.Adapter<Asma2ElsewarAdapte
          */
         void bind(int listIndex) {
 
-            position = listIndex;
             listItemNumberView.setText(sewarNames.get(listIndex));
         }
-
-
         // Override onClick, passing the clicked item's position (getAdapterPosition()) to mOnClickListener via its onListItemClick method
         /**
          * Called whenever a user clicks on an item in the list.
@@ -169,8 +166,10 @@ public class Asma2ElsewarAdapter extends RecyclerView.Adapter<Asma2ElsewarAdapte
          */
         @Override
         public void onClick(View v) {
-//            int clickedPosition = getAdapterPosition();
-            mOnClickListener.onListItemClick(position);
+
+            int clickedPosition = getAdapterPosition();
+            mOnClickListener.onListItemClick(clickedPosition);
+
         }
     }
 }

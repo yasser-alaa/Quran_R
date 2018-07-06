@@ -18,6 +18,17 @@ import java.util.Locale;
 public class Utils {
 
     /**
+=======
+class Utils {
+
+    /**
+     * function to start the media recorder and use helper functions to make the
+     * directory to save the audio file that will be recorded
+     * @param recorder media recorder
+     * @return the path of the audio file
+     */
+    /**
+>>>>>>> tobepushed
      * translate english numbers to arabic
      * @param sora string with english numbers
      * @return String sora with arabic numbers
@@ -26,9 +37,10 @@ public class Utils {
         //translation of english numbers
         char[] arabicChars = {'٠','١','٢','٣','٤','٥','٦','٧','٨','٩'};
         StringBuilder builder = new StringBuilder();
-        for(int i =0;i<sora .length();i++) {
+
+        for(int i =0;i<sora.length();i++) {
             if(Character.isDigit(sora .charAt(i)))
-                builder.append(arabicChars[(int)(sora .charAt(i))-48]);
+                builder.append(arabicChars[(int)(sora.charAt(i))-48]);
             else
                 builder.append(sora .charAt(i));
 

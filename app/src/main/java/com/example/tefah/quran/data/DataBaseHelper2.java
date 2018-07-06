@@ -308,11 +308,19 @@ public class DataBaseHelper2 extends SQLiteOpenHelper {
     }
 
     /*public List<Page> getListOfpages() {
+<<<<<<< HEAD
+=======
+
+>>>>>>> tobepushed
         List<Page> pageList = new ArrayList<>();
         openDatabase();
         Cursor cursor = mDatabase.rawQuery("SELECT * FROM Book2 ", null);
         cursor.moveToFirst();
         while (!cursor.isAfterLast()) {
+<<<<<<< HEAD
+=======
+
+>>>>>>> tobepushed
             pageList.add(new Page(cursor.getInt(cursor.getColumnIndex("aya")), cursor.getInt(cursor.getColumnIndex("page")), cursor.getInt(cursor.getColumnIndex("sura"))));
             cursor.moveToNext();
         }
@@ -438,3 +446,4 @@ public class DataBaseHelper2 extends SQLiteOpenHelper {
 //        return suraList;
 //    }
 }
+

@@ -160,7 +160,6 @@ public class DataBaseHelper extends SQLiteOpenHelper {
         return suraNum;
     }
 
-
     public List<Aya> getListOfAyas() {
         List<Aya> ayaList = new ArrayList<>();
         openDatabase();
@@ -168,6 +167,7 @@ public class DataBaseHelper extends SQLiteOpenHelper {
         cursor.moveToFirst();
         int counter = 0;
         while (!cursor.isAfterLast()) {
+
             ayaList.add(new Aya(cursor.getString(cursor.getColumnIndex("text")), counter));
             counter++;
             cursor.moveToNext();
@@ -339,39 +339,92 @@ public class DataBaseHelper extends SQLiteOpenHelper {
         }
         cursorAyatCount.close();
 
-        //set start page of every sura
+        /*
+        //set end page of every sura
+        */
         int counter = 0;       //counter that accessing the sewar list
-        int startPageNumber, suraNum;
+        int endPageNumber=604, suraNum;
         //specific case of fateha
         suraList.get(counter).setStartPage(1);
+        suraList.get(counter).setEndPage(1);
 
-        counter++;
-        Cursor cursorStartPage = mDatabase.rawQuery("select page,sura from Book2 group by sura ", null);
-        cursorStartPage.moveToFirst();
-        while (!cursorStartPage.isAfterLast()) {
+       // counter++;
+       // store end pages of sewar
+        Cursor cursorEndPage = mDatabase.rawQuery("select page,sura from Book2 group by sura ", null);
+        cursorEndPage.moveToFirst();
+        while (!cursorEndPage.isAfterLast()) {
             if (counter != 114) {
-                suraNum = cursorStartPage.getInt(1);
+                suraNum = cursorEndPage.getInt(1);  //el rakam el sa7e7 ely fel quran
+                endPageNumber = cursorEndPage.getInt(0);
 
-                startPageNumber = cursorStartPage.getInt(0) + 1;
-
-                suraList.get(counter).setStartPage(startPageNumber);
-                cursorStartPage.moveToNext();
-                if(!cursorStartPage.isAfterLast()){
-                    if((cursorStartPage.getInt(1) - suraNum) != 1) {
-                        // kam sura fatet fe el nos (have same start page)
-                        for (; counter < cursorStartPage.getInt(1); counter++) {
-                            suraList.get(counter).setStartPage(startPageNumber);
-                        }
+                suraList.get(counter).setEndPage(endPageNumber);
+                cursorEndPage.moveToNext();
+                //check if there are sewar fe el nos has same end page
+                if(!cursorEndPage.isAfterLast()){
+                    if((cursorEndPage.getInt(1) - suraNum) == 2) {
+                        // kam sura fatet fe el nos (have same end page)>>assign to them the same end page num
+                            counter++;
+                            suraList.get(counter).setEndPage(endPageNumber);
                     }
+                    else if((cursorEndPage.getInt(1) - suraNum) == 3){
+                        counter++;
+                        suraList.get(counter).setEndPage(endPageNumber);
+                        counter++;
+                        suraList.get(counter).setEndPage(endPageNumber);
+                    }
+                        counter++;
+
                 }
-                counter++;
-            }
-            else {
-                Log.d("maynf3sh kda", "el counter 3ada el 114");
             }
         }
-        cursorStartPage.close();
+        counter++;
+        suraList.get(counter).setEndPage(endPageNumber);
+        counter++;
+        suraList.get(counter).setEndPage(endPageNumber);
+        cursorEndPage.close();
         closeDatabase();
+        /*
+        *calc start page
+        * then store them in suraList */
+        List<Page> pageList = getListOfpages();
+        int startAyahOfNextPage =0 ,currentSuraEndPageNumber,nextSuraEndPageNumber ,nextSuraStartPageNumber=0;
+        for(int i =0;i<113;i++){
+            //law el soraten m3ndhmsh nafs el endpage yb2a aked homa msh m3 b3d fe nafs el page
+            // zay el baqra w 2al 3mran
+            currentSuraEndPageNumber = suraList.get(i).getEndPage();
+            nextSuraEndPageNumber = suraList.get(i+1).getEndPage();
+            if(i==85){//sura el a3la
+                Log.d("CRASH","msh by3rd 7aga fe el do7a , crach");
+            }
+            if((currentSuraEndPageNumber+1) < 604){  //3ashan ama yewsl le a5r page
+                startAyahOfNextPage = pageList.get(currentSuraEndPageNumber).getPageStartAyahNumber();
+            }
+
+            if(currentSuraEndPageNumber != nextSuraEndPageNumber){
+                 /*case 1 :
+                *   sura ends and the next start at the new page*/
+                if(startAyahOfNextPage == 1){
+                    nextSuraStartPageNumber = currentSuraEndPageNumber+1;
+                    suraList.get(i+1).setStartPage(nextSuraStartPageNumber);
+                }
+            /*case 2 :
+            * sura ends then the next starts and ends in another page
+            * zay el ma2da maslan*/
+                else{
+                    nextSuraStartPageNumber = currentSuraEndPageNumber;
+                    suraList.get(i+1).setStartPage(nextSuraStartPageNumber);
+                }
+            }
+             /*case 3 :
+            * sura ends then the next starts and ends in the same page
+            * zay el do7a w el shar7*/
+            else if(currentSuraEndPageNumber == nextSuraEndPageNumber){
+                nextSuraStartPageNumber = currentSuraEndPageNumber;
+                    suraList.get(i+1).setStartPage(nextSuraStartPageNumber);
+            }
+        }
+
+
        /* first we get all ayat of quran
          we want to store each list of ayat in each sura
         one big forloop for number of sewar
