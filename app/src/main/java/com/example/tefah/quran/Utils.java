@@ -32,9 +32,9 @@ class Utils {
         //translation of english numbers
         char[] arabicChars = {'٠','١','٢','٣','٤','٥','٦','٧','٨','٩'};
         StringBuilder builder = new StringBuilder();
-        for(int i =0;i<sora .length();i++) {
+        for(int i =0;i<sora.length();i++) {
             if(Character.isDigit(sora .charAt(i)))
-                builder.append(arabicChars[(int)(sora .charAt(i))-48]);
+                builder.append(arabicChars[(int)(sora.charAt(i))-48]);
             else
                 builder.append(sora .charAt(i));
 

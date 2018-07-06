@@ -2,6 +2,7 @@ package com.example.tefah.quran;
 
 import android.content.Context;
 import android.content.Intent;
+import android.graphics.Typeface;
 import android.support.v4.view.PagerAdapter;
 import android.support.v4.view.ViewPager;
 import android.support.v7.app.AppCompatActivity;
@@ -88,11 +89,19 @@ public class Main2Activity extends AppCompatActivity {
         @Override
         public Object instantiateItem(ViewGroup container, int position) {
             final View page = inflater.inflate(R.layout.page, null);
+            Typeface custom_font = Typeface.createFromAsset(getAssets(),  "ZekrQuran.ttf");
+
             /*TODO (1)
             number of lines*/
             String pageTextDisplay = getPageTextDisplay(position);
-            ((TextView) (page.findViewById(R.id.ayatQuran))).setText(pageTextDisplay);
+            pageTextDisplay = Utils.translateNumbers(pageTextDisplay);
+            TextView ayatTV =  (TextView) (page.findViewById(R.id.ayatQuran));
+            ayatTV.setTypeface(custom_font);
+            ayatTV.setText(pageTextDisplay);
+
+         //   ((TextView) (page.findViewById(R.id.ayatQuran))).setText(pageTextDisplay);
             //Add the page to the front of the queue
+
             ((ViewPager) container).addView(page, 0);
             return page;
         }

@@ -1,6 +1,23 @@
 <?xml version="1.0" encoding="utf-8"?>
-<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:layout_width="match_parent" android:layout_height="match_parent">
+<android.support.constraint.ConstraintLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+    <ImageView
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintRight_toRightOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        android:background="@drawable/gradient_scrim"/>
+    <ScrollView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content">
+
     <TextView
         android:id="@+id/ayatQuran"
         android:layout_width="wrap_content"
@@ -8,8 +25,10 @@
         android:layout_centerHorizontal="true"
         android:layout_centerVertical="true"
         android:text="TextView"
-        android:lines="15"
-        android:textSize="@dimen/text_size"
+        android:padding="@dimen/xxmargin"
+        android:lineSpacingExtra="20dp"
+        android:textSize="22sp"
     />
+    </ScrollView>
 
-</RelativeLayout>
+</android.support.constraint.ConstraintLayout>
