@@ -83,6 +83,7 @@ public class Main2Activity extends AppCompatActivity {
 
     }
 
+
     class MyPagesAdapter extends PagerAdapter {
 
         @Override
