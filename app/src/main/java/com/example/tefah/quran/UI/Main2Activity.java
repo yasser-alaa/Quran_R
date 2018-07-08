@@ -1,5 +1,6 @@
 package com.example.tefah.quran.UI;
 
+import android.app.SearchManager;
 import android.content.Context;
 import android.content.Intent;
 import android.graphics.Typeface;
@@ -40,6 +41,9 @@ public class Main2Activity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main2);
+
+        handleIntent(getIntent());
+
         mDBHelper = new DataBaseHelper(this);
         mDBHelper2 =new DataBaseHelper2(this);
         //get all ayat into list of ayat class
@@ -58,16 +62,7 @@ public class Main2Activity extends AppCompatActivity {
          *       if detected in ayah then add this aya to the result list
          *       continue search till ayas end
          **/
-        if(intent.hasExtra(Intent.EXTRA_TEXT)){
-            mAyaSearched = intent.getStringExtra(Intent.EXTRA_TEXT);
-            for(Aya ayaTemp : ayas){
-                if(ayaTemp.getAyahText().contains(mAyaSearched)){
-                    resultAyas.add(ayaTemp.getAyahText());
-                    suraNumber = mDBHelper.getSuraNumber(ayaTemp.getAyaNum());
-                }
-            }
-        }
-        else if(intent.hasExtra(Intent.EXTRA_INDEX)){
+         if(intent.hasExtra(Intent.EXTRA_INDEX)){
             suraNumber = intent.getIntExtra(Intent.EXTRA_INDEX, 0);
         }
 
@@ -80,6 +75,26 @@ public class Main2Activity extends AppCompatActivity {
         vp.setAdapter(new MyPagesAdapter());
         vp.setCurrentItem(startPagePosition);
 
+
+    }
+
+    @Override
+    protected void onNewIntent(Intent intent) {
+        super.onNewIntent(intent);
+        handleIntent(intent);
+    }
+
+    private void handleIntent(Intent intent) {
+        if (Intent.ACTION_SEARCH.equals(intent.getAction())) {
+            mAyaSearched  = intent.getStringExtra(SearchManager.QUERY);
+                for(Aya ayaTemp : ayas){
+                    if(ayaTemp.getAyahText().contains(mAyaSearched)){
+                        resultAyas.add(ayaTemp.getAyahText());
+                        suraNumber = mDBHelper.getSuraNumber(ayaTemp.getAyaNum());
+                    }
+                }
+
+        }
 
     }
 

@@ -7,4 +7,8 @@
 
     <string name="time_exceeded">You are exceedeing limit voice recording</string>
     <string name="uploading">Uploading the file...</string>
+    <string name="search_by_text">search quran</string>
+    <string name="search_hint">search in the quran</string>
+    <string name="blind_mode">Blide mode</string>
+    <string name="blind_mode_on">Blind Mode ON</string>
 </resources>

@@ -2,6 +2,7 @@ package com.example.tefah.quran.UI;
 
 import android.Manifest;
 import android.annotation.SuppressLint;
+import android.app.SearchManager;
 import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
@@ -17,8 +18,12 @@ import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.support.v7.widget.SearchView;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.MotionEvent;
 import android.view.View;
 import android.widget.Button;
@@ -77,8 +82,6 @@ public class MainActivity extends AppCompatActivity implements Asma2ElsewarAdapt
 
 @BindView(R.id.voice_recorder)
     FloatingActionButton voiceRecorder;
-    @BindView(R.id.search_edit_text)
-    EditText searchEditText;
     Button searchButton;
 
 
@@ -363,12 +366,12 @@ public class MainActivity extends AppCompatActivity implements Asma2ElsewarAdapt
     }
 
     public void onSearch(View view) {
-        //get text from searchEditText when click button
-        String AyaWrittenInSearchBox = searchEditText.getText().toString();
-        Context context = MainActivity.this;
-        Intent startChildActivityIntent = new Intent(context, Main2Activity.class);
-        startChildActivityIntent.putExtra(Intent.EXTRA_TEXT, AyaWrittenInSearchBox);
-        startActivity(startChildActivityIntent);
+//        //get text from searchEditText when click button
+//        String AyaWrittenInSearchBox = searchEditText.getText().toString();
+//        Context context = MainActivity.this;
+//        Intent startChildActivityIntent = new Intent(context, Main2Activity.class);
+//        startChildActivityIntent.putExtra(Intent.EXTRA_TEXT, AyaWrittenInSearchBox);
+//        startActivity(startChildActivityIntent);
     }
 
 
@@ -384,6 +387,34 @@ public class MainActivity extends AppCompatActivity implements Asma2ElsewarAdapt
         if (player != null) {
             onSeekComplete(player);
         }
+    }
+
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        MenuInflater inflater = getMenuInflater();
+        inflater.inflate(R.menu.options_menu, menu);
+
+        // Associate searchable configuration with the SearchView
+        SearchManager searchManager =
+                (SearchManager) getSystemService(Context.SEARCH_SERVICE);
+        SearchView searchView =
+                (SearchView) menu.findItem(R.id.search).getActionView();
+        searchView.setSearchableInfo(
+                searchManager.getSearchableInfo(getComponentName()));
+
+
+        return true;
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        switch (item.getItemId()){
+            case R.id.blind_mode:
+                break;
+                default:
+
+        }
+        return true;
     }
 }
 

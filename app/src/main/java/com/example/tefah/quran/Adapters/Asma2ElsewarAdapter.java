@@ -42,6 +42,7 @@ public class Asma2ElsewarAdapter extends RecyclerView.Adapter<Asma2ElsewarAdapte
         void onListItemClick(int clickedItemIndex);
     }
 
+
     // Add a ListItemClickListener as a parameter to the constructor and store it in mOnClickListener
     /**
      * Constructor for Asma2ElsewarAdapter that accepts a number of items to display and the specification
