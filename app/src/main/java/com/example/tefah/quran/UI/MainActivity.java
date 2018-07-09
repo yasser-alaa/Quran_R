@@ -14,6 +14,7 @@ import android.os.CountDownTimer;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
+import android.support.v4.view.MenuItemCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.LinearLayoutManager;
@@ -27,7 +28,6 @@ import android.view.MenuItem;
 import android.view.MotionEvent;
 import android.view.View;
 import android.widget.Button;
-import android.widget.EditText;
 import android.widget.Toast;
 
 import com.example.tefah.quran.R;
@@ -40,14 +40,10 @@ import com.example.tefah.quran.network.ServiceGenerator;
 import java.io.File;
 import java.io.IOException;
 
-import java.io.FileOutputStream;
-import java.io.InputStream;
-import java.io.OutputStream;
 import java.util.List;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
-import butterknife.OnClick;
 import okhttp3.MediaType;
 import okhttp3.MultipartBody;
 import okhttp3.RequestBody;
@@ -56,7 +52,7 @@ import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
 
-public class MainActivity extends AppCompatActivity implements Asma2ElsewarAdapter.ListItemClickListener,
+public class MainActivity extends AppCompatActivity implements Asma2ElsewarAdapter.ListItemTouchListner,
         MediaPlayer.OnSeekCompleteListener{
 
     private Asma2ElsewarAdapter mAdapter;
@@ -68,8 +64,9 @@ public class MainActivity extends AppCompatActivity implements Asma2ElsewarAdapt
 
     public static final int MY_PERMISSIONS_REQUEST_RECORD_AUDIO = 100 ;
     public static final int MY_PERMISSIONS_REQUEST_WRITE_STORAGE = 200 ;
-    private static  boolean RECODER_TIME_OK = false;
-    private static  boolean IS_TOO_MUCH = false;
+    private static boolean RECODER_TIME_OK = false;
+    private static boolean IS_TOO_MUCH = false;
+    private static boolean IS_GESTURE_READ = true;
 
 
 
@@ -78,6 +75,7 @@ public class MainActivity extends AppCompatActivity implements Asma2ElsewarAdapt
     MediaPlayer player;
     private CountDownTimer minTimer;
     private CountDownTimer maxTimer;
+    private CountDownTimer readTimer;
 
 
 @BindView(R.id.voice_recorder)
@@ -111,6 +109,7 @@ public class MainActivity extends AppCompatActivity implements Asma2ElsewarAdapt
         mSewarList.setHasFixedSize(true);
         mAdapter = new Asma2ElsewarAdapter(NUM_LIST_ITEMS,this,mSewarNames);
         mSewarList.setAdapter(mAdapter);
+//        mSewarList.setOnTouchListener(new TouchListener());
 
         voiceRecorder.setOnTouchListener(new View.OnTouchListener() {
             @Override
@@ -118,32 +117,12 @@ public class MainActivity extends AppCompatActivity implements Asma2ElsewarAdapt
                 int action = motionEvent.getAction();
                 switch (action){
                     case MotionEvent.ACTION_DOWN:
-                        recorder = new MediaRecorder();
-                        if (grantPermission()) {
-                            tennn();
-                            record();
-                        }
+                        actionDown();
                         break;
                     case MotionEvent.ACTION_UP:
                         if (IS_TOO_MUCH)
                             break;
-                        if (RECODER_TIME_OK) {
-                            Utils.stopRecording(recorder);
-                            if (audioPath != null) {
-                                Toast.makeText(MainActivity.this, getString(R.string.uploading), Toast.LENGTH_SHORT)
-                                        .show();
-                                uploadFile();
-                            }
-                        } else {
-                            recordStopSound();
-                            Toast.makeText(MainActivity.this, "Hold to record voice",
-                                    Toast.LENGTH_SHORT).show();
-                            recorder.release();
-                            recorder = null;
-                        }
-                        minTimer.cancel();
-                        maxTimer.cancel();
-                        RECODER_TIME_OK = false;
+                        actionUP();
                         break;
                     default:
                 }
@@ -151,6 +130,37 @@ public class MainActivity extends AppCompatActivity implements Asma2ElsewarAdapt
             }
 
         });
+    }
+
+    private void actionUP() {
+
+        if (RECODER_TIME_OK) {
+            Utils.stopRecording(recorder);
+            if (audioPath != null) {
+                Toast.makeText(MainActivity.this, getString(R.string.uploading), Toast.LENGTH_SHORT)
+                        .show();
+                uploadFile();
+            }
+        } else {
+            recordStopSound();
+            Toast.makeText(MainActivity.this, "Hold to record voice",
+                    Toast.LENGTH_SHORT).show();
+            recorder.release();
+            recorder = null;
+        }
+        minTimer.cancel();
+        maxTimer.cancel();
+        readTimer.cancel();
+        RECODER_TIME_OK = false;
+    }
+
+    private void actionDown() {
+        recorder = new MediaRecorder();
+        if (grantPermission()) {
+            tennn();
+            record();
+        }
+
     }
 
     /**
@@ -187,6 +197,7 @@ public class MainActivity extends AppCompatActivity implements Asma2ElsewarAdapt
 
     private void record() {
         IS_TOO_MUCH = false;
+        IS_GESTURE_READ = true;
         audioPath = Utils.startRecording(recorder);
         minTimer =  new CountDownTimer(2000, 1000) {
 
@@ -209,13 +220,17 @@ public class MainActivity extends AppCompatActivity implements Asma2ElsewarAdapt
 
                 Toast.makeText(MainActivity.this, getString(R.string.time_exceeded), Toast.LENGTH_SHORT)
                         .show();
+            }
+        }.start();
+        readTimer = new CountDownTimer(500, 1) {
+            @Override
+            public void onTick(long l) {
 
-                Utils.stopRecording(recorder);
-                if (audioPath != null) {
-                    uploadFile();
-                    Toast.makeText(MainActivity.this, getString(R.string.uploading), Toast.LENGTH_SHORT)
-                            .show();
-                }
+            }
+
+            @Override
+            public void onFinish() {
+                IS_GESTURE_READ = false;
             }
         }.start();
 
@@ -353,17 +368,17 @@ public class MainActivity extends AppCompatActivity implements Asma2ElsewarAdapt
      *
      * @param clickedItemIndex Index in the list of the item that was clicked.
      */
-    @Override
-    public void onListItemClick(int clickedItemIndex) {
-        Context context = MainActivity.this;
-        // String nameOfSura = messages.get(clickedItemIndex);
-
-        Intent startChildActivityIntent = new Intent(context, Main2Activity.class);
-        startChildActivityIntent.putExtra(Intent.EXTRA_INDEX, clickedItemIndex);
-
-        startActivity(startChildActivityIntent);
-
-    }
+//    @Override
+//    public void onListItemClick(int clickedItemIndex) {
+//        Context context = MainActivity.this;
+//        // String nameOfSura = messages.get(clickedItemIndex);
+//
+//        Intent startChildActivityIntent = new Intent(context, Main2Activity.class);
+//        startChildActivityIntent.putExtra(Intent.EXTRA_INDEX, clickedItemIndex);
+//
+//        startActivity(startChildActivityIntent);
+//
+//    }
 
     public void onSearch(View view) {
 //        //get text from searchEditText when click button
@@ -397,13 +412,49 @@ public class MainActivity extends AppCompatActivity implements Asma2ElsewarAdapt
         // Associate searchable configuration with the SearchView
         SearchManager searchManager =
                 (SearchManager) getSystemService(Context.SEARCH_SERVICE);
-        SearchView searchView =
+        final SearchView searchView =
                 (SearchView) menu.findItem(R.id.search).getActionView();
-        searchView.setSearchableInfo(
-                searchManager.getSearchableInfo(getComponentName()));
+//        searchView.setSearchableInfo(
+//                searchManager.getSearchableInfo(getComponentName()));
 
+        searchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
+            @Override
+            public boolean onQueryTextSubmit(String query) {
+                searchView.clearFocus();
+                Context context = MainActivity.this;
+                Intent startChildActivityIntent = new Intent(context, Main2Activity.class);
+                startChildActivityIntent.putExtra(Intent.EXTRA_TEXT, query);
+                startActivity(startChildActivityIntent);
+                return true;
+            }
 
-        return true;
+            @Override
+            public boolean onQueryTextChange(String newText) {
+                return false;
+            }
+        });
+
+//        final SearchView searchViewAndroidActionBar = (SearchView) MenuItemCompat.getActionView(searchViewItem);
+//        searchViewAndroidActionBar.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
+//            @Override
+//            public boolean onQueryTextSubmit(String query) {
+//                searchViewAndroidActionBar.clearFocus();
+//
+//
+//                Intent intent = new Intent(HeadActivity.this, SearchActivity.class);
+//                intent.putExtra("some_key", query);
+//                startActivity(intent);
+//
+//                return true;
+//            }
+//
+//            @Override
+//            public boolean onQueryTextChange(String newText) {
+//
+//                return false;
+//            }
+//        });
+        return super.onCreateOptionsMenu(menu);
     }
 
     @Override
@@ -416,6 +467,62 @@ public class MainActivity extends AppCompatActivity implements Asma2ElsewarAdapt
         }
         return true;
     }
+
+    @Override
+    public void onListTouch(MotionEvent event, int position) {
+        Log.i("ON_TOUCH_LISTENER_BEGIN", String.valueOf(recorder));
+        switch (event.getAction()){
+            case MotionEvent.ACTION_DOWN:
+                if (recorder != null){
+                    abort();
+                    break;
+                }
+                Log.i("ON_TOUCH_LISTENER_DOWN", String.valueOf(recorder));
+                actionDown();
+                break;
+            case MotionEvent.ACTION_UP:
+                if (recorder == null){
+                    // making new recorder to use the same function only :D
+                    recorder = new MediaRecorder();
+                    abort();
+                    break;
+                }
+                Log.i("ON_TOUCH_LISTENER_UP", String.valueOf(recorder));
+                if (IS_TOO_MUCH) {
+                   actionUP();
+                    break;
+                }
+                if (IS_GESTURE_READ){
+                    abort();
+                    gotoRead(position);
+                    break;
+                }
+                actionUP();
+                break;
+                default:
+
+        }
+    }
+
+    private void abort() {
+        recorder.release();
+        recorder = null;
+        minTimer.cancel();
+        maxTimer.cancel();
+        readTimer.cancel();
+        RECODER_TIME_OK = false;
+    }
+
+    private void gotoRead(int clickedItemIndex){
+        Context context = MainActivity.this;
+//        String nameOfSura = messages.get(clickedItemIndex);
+
+        Intent startChildActivityIntent = new Intent(context, Main2Activity.class);
+        startChildActivityIntent.putExtra(Intent.EXTRA_INDEX, clickedItemIndex);
+
+        startActivity(startChildActivityIntent);
+    }
+
 }
 
 /**

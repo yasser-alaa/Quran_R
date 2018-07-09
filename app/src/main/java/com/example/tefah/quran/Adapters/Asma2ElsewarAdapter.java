@@ -4,6 +4,7 @@ import android.content.Context;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 import android.view.LayoutInflater;
+import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
@@ -26,7 +27,8 @@ public class Asma2ElsewarAdapter extends RecyclerView.Adapter<Asma2ElsewarAdapte
      * An on-click handler that we've defined to make it easy for an Activity to interface with
      * our RecyclerView
      */
-    final private ListItemClickListener mOnClickListener;
+//    final private ListItemClickListener mOnClickListener;
+    final private ListItemTouchListner touchListener;
 
 
     private static int viewHolderCount;
@@ -42,6 +44,9 @@ public class Asma2ElsewarAdapter extends RecyclerView.Adapter<Asma2ElsewarAdapte
         void onListItemClick(int clickedItemIndex);
     }
 
+    public interface ListItemTouchListner{
+        void onListTouch(MotionEvent event, int clickedItemIndex);
+    }
 
     // Add a ListItemClickListener as a parameter to the constructor and store it in mOnClickListener
     /**
@@ -51,10 +56,11 @@ public class Asma2ElsewarAdapter extends RecyclerView.Adapter<Asma2ElsewarAdapte
      * @param numberOfItems Number of items to display in list
      * @param listener Listener for list item clicks
      */
-    public Asma2ElsewarAdapter(int numberOfItems, ListItemClickListener listener , List<String> l) {
+    public Asma2ElsewarAdapter(int numberOfItems, ListItemTouchListner listener , List<String> l) {
         mNumberItems = numberOfItems;
-        mOnClickListener = listener;
+        touchListener = listener;
         viewHolderCount = 0;
+
 
         // messages if we want to send list of strings instead of getting strings from database
         sewarNames = l ;
@@ -129,7 +135,7 @@ public class Asma2ElsewarAdapter extends RecyclerView.Adapter<Asma2ElsewarAdapte
      * Cache of the children views for a list item.
      */
     class NumberViewHolder extends RecyclerView.ViewHolder
-            implements View.OnClickListener {
+            implements View.OnTouchListener {
 
         // Will display the position in the list, ie 0 through getItemCount() - 1
         TextView listItemNumberView;
@@ -148,7 +154,8 @@ public class Asma2ElsewarAdapter extends RecyclerView.Adapter<Asma2ElsewarAdapte
 
             listItemNumberView = (TextView) itemView.findViewById(R.id.tv_item_number);
             //  Call setOnClickListener on the View passed into the constructor (use 'this' as the OnClickListener)
-            itemView.setOnClickListener(this);
+//            itemView.setOnClickListener(this);
+            itemView.setOnTouchListener(this);
         }
 
         /**
@@ -165,12 +172,32 @@ public class Asma2ElsewarAdapter extends RecyclerView.Adapter<Asma2ElsewarAdapte
          * Called whenever a user clicks on an item in the list.
          * @param v The View that was clicked
          */
+
+
+//        @Override
+//        public void onClick(View v) {
+//
+//            int clickedPosition = getAdapterPosition();
+//            mOnClickListener.onListItemClick(clickedPosition);
+//
+//
+//        }
+
         @Override
-        public void onClick(View v) {
+        public boolean onTouch(View view, MotionEvent motionEvent) {
 
             int clickedPosition = getAdapterPosition();
-            mOnClickListener.onListItemClick(clickedPosition);
-
+            switch (motionEvent.getAction()){
+                case MotionEvent.ACTION_DOWN:
+                    touchListener.onListTouch(motionEvent, clickedPosition);
+                    break;
+                case MotionEvent.ACTION_UP:
+                    touchListener.onListTouch(motionEvent, clickedPosition);
+                    break;
+                    default:
+                        break;
+            }
+            return true;
         }
     }
 }
