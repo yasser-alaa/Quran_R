@@ -9,6 +9,7 @@ import android.preference.PreferenceManager;
 import android.util.Log;
 
 import com.example.tefah.quran.QuranInfo.*;
+import com.example.tefah.quran.multiArrays;
 
 import java.io.File;
 import java.io.FileOutputStream;
@@ -138,20 +139,52 @@ public class DataBaseHelper extends SQLiteOpenHelper {
     public String getaya(int ayaNumber, int suraNumber) {
         String Sura = Integer.toString(suraNumber);
         String aya = Integer.toString(ayaNumber);
+        String ayaText = " ";
         openDatabase();
 
         Cursor cursor = mDatabase.rawQuery("SELECT text FROM quran_text WHERE sura = " + Sura + " and aya = " + ayaNumber, null);
         cursor.moveToFirst();
-        String ayaText = cursor.getString(cursor.getColumnIndex("text"));
+        if(!cursor.isAfterLast()){
+             ayaText = cursor.getString(cursor.getColumnIndex("text"));
+        }
         cursor.close();
         closeDatabase();
         return ayaText;
     }
+    public multiArrays SearchWith(String Txt) {
+        String[] Ayah, surah,Ayah_num,surah_num;
+        List<String>Chapters = suraNames();
+        openDatabase();
+        Cursor cursor = mDatabase.rawQuery("SELECT text,sura,aya FROM quran_text WHERE text LIKE " + "'%" + Txt + "%' ", null);
+        cursor.moveToFirst();
+        Ayah = new String[cursor.getCount()];
+        surah = new String[cursor.getCount()];
+        Ayah_num=new String[cursor.getCount()];
+        surah_num=new String[cursor.getCount()];
+        int counter = 0;
+        while (!cursor.isAfterLast()) {
+            Ayah[counter] = cursor.getString(cursor.getColumnIndex("text"));
+            Ayah_num[counter]=cursor.getString(cursor.getColumnIndex("aya"));
+            String sura_num = cursor.getString(cursor.getColumnIndex("sura"));
+            surah_num[counter]=sura_num;
+            surah[counter] = Chapters.get(Integer.parseInt(sura_num)-1);
+            counter++;
+            cursor.moveToNext();
+        }
+        cursor.close();
+        closeDatabase();
+        multiArrays m = new multiArrays();
+        m.Ayah = Ayah;
+        m.Sura = surah;
+        m.Ayah_num = Ayah_num;
+        m.Sura_num = surah_num;
+        return m;
+    }
 
-    public int getSuraNumber(int idOfSura){
+    public int getSuraNumber(String idOfSura){
         int suraNum=0;
         openDatabase();
-        Cursor cursor = mDatabase.rawQuery("select sura from quran_text where id = "+ idOfSura,null);
+        Cursor cursor = mDatabase.rawQuery("select sura from quran_text where text = '"+ idOfSura+"'",null);
         cursor.moveToFirst();
         suraNum =  cursor.getInt(0);
         cursor.close();

@@ -2,14 +2,18 @@ package com.example.tefah.quran;
 
 import android.Manifest;
 import android.annotation.SuppressLint;
+import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
+import android.content.ServiceConnection;
 import android.content.pm.PackageManager;
 import android.content.res.AssetFileDescriptor;
 import android.media.MediaPlayer;
 import android.media.MediaRecorder;
+import android.os.AsyncTask;
 import android.os.Build;
 import android.os.CountDownTimer;
+import android.os.IBinder;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
@@ -56,13 +60,20 @@ public class MainActivity extends AppCompatActivity implements Asma2ElsewarAdapt
     public MediaRecorder recorder;
     //------------------------------------------------
     List<String> mSewarNames;
-        MediaPlayer player;
+
+
+    MediaPlayer player;
     @BindView(R.id.voice_recorder)
     FloatingActionButton voiceRecorder;
     @BindView(R.id.test_player)
     FloatingActionButton testPlayer;
     private Asma2ElsewarAdapter mAdapter;
     private RecyclerView mSewarList;
+
+    private static String out = "";
+    public SpeechRecognizerDemo MySpeechRec;
+    public boolean isBound = false;
+
     private String audioPath;
     private CountDownTimer minTimer;
     private CountDownTimer maxTimer;
@@ -85,6 +96,7 @@ public class MainActivity extends AppCompatActivity implements Asma2ElsewarAdapt
          * do things like set the adapter of the RecyclerView and toggle the visibility.
          */
         mSewarList = findViewById(R.id.namesOfsewar);
+
 
     /*
      * A LinearLayoutManager is responsible for measuring and positioning item views within a
@@ -118,7 +130,8 @@ public class MainActivity extends AppCompatActivity implements Asma2ElsewarAdapt
                         recorder = new MediaRecorder();
                         if (grantPermission()) {
                             tennn();
-                            record();
+                            //record();
+                            voiceSearch(view);
                         }
                         break;
                     case MotionEvent.ACTION_UP:
@@ -138,8 +151,8 @@ public class MainActivity extends AppCompatActivity implements Asma2ElsewarAdapt
                             recorder.release();
                             recorder = null;
                         }
-                        minTimer.cancel();
-                        maxTimer.cancel();
+                       // minTimer.cancel();
+                        //maxTimer.cancel();
                         RECODER_TIME_OK = false;
                         break;
                     default:
@@ -149,10 +162,35 @@ public class MainActivity extends AppCompatActivity implements Asma2ElsewarAdapt
 
         });
     }
+    private ServiceConnection mConnection = new ServiceConnection() {
 
+        @Override
+        public void onServiceConnected(ComponentName className,
+                                       IBinder service) {
+            // We've bound to LocalService, cast the IBinder and get LocalService instance
+            SpeechRecognizerDemo.LocalBinder binder = (SpeechRecognizerDemo.LocalBinder) service;
+            MySpeechRec = binder.getService();
+            isBound = true;
+        }
+
+        @Override
+        public void onServiceDisconnected(ComponentName arg0) {
+            isBound = false;
+        }
+    };
+
+    @Override
+    protected void onStart(){
+        super.onStart();
+
+        Intent SpeechRec = new Intent(MainActivity.this , SpeechRecognizerDemo.class);
+        bindService(SpeechRec,mConnection, Context.BIND_AUTO_CREATE);
+        Toast.makeText(this,"on start ",Toast.LENGTH_LONG).show();
+    }
     /**
      * play sound to indicate something wrong with recording
      */
+
     private void recordStopSound() {
         if (player != null){
             onSeekComplete(player);
@@ -181,7 +219,53 @@ public class MainActivity extends AppCompatActivity implements Asma2ElsewarAdapt
             e.printStackTrace();
         }
     }
+    // ------------- Mohammad Alberry Functions Start .
+    @SuppressLint("StaticFieldLeak")
+    public void voiceSearch(View view) {
+        if (isBound) {
+            // Call a method from the LocalService.
+            // However, if this call were something that might hang, then this request should
+            // occur in a separate thread to avoid slowing down the activity performance.
+            MySpeechRec.restart();
+            out = "";
+            new AsyncTask<Void, Void, Boolean>() {
+                @Override
+                protected void onPreExecute() {
+                    super.onPreExecute();
+                }
+                @Override
+                protected Boolean doInBackground(Void... voids) {
+                    try{
+                        while (out == ""){out = MySpeechRec.out;}
+                        return true;
+                    }
+                    finally{
+                        return true;
+                    }
 
+                }
+
+                @Override
+                protected void onPostExecute(Boolean result) {
+                    super.onPostExecute(result);
+                    //------- we should do the search Here
+                    SearchResult sAdapter  = new SearchResult(MainActivity.this,out);
+                    if(sAdapter.getItemCount() == 0){
+                        Toast.makeText(MainActivity.this, "من فضلك إضغط على البحث الصوتى و تحدث مرة أخرى ..", Toast.LENGTH_SHORT).show();
+                    }else{
+                        Intent i = new Intent(MainActivity.this,search_result.class);
+                        i.putExtra("sTxt",out);
+                        startActivity(i);
+                        //sResultList.setAdapter(sAdapter);
+
+                    }
+
+
+                }
+            }.execute();
+        }
+
+    }
     private void record() {
         IS_TOO_MUCH = false;
         audioPath = Utils.startRecording(recorder);
@@ -207,7 +291,7 @@ public class MainActivity extends AppCompatActivity implements Asma2ElsewarAdapt
                 Toast.makeText(MainActivity.this, getString(R.string.time_exceeded), Toast.LENGTH_SHORT)
                         .show();
 
-                Utils.stopRecording(recorder);
+                //Utils.stopRecording(recorder);
                 if (audioPath != null) {
                     uploadFile();
                     Toast.makeText(MainActivity.this, getString(R.string.uploading), Toast.LENGTH_SHORT)
@@ -392,8 +476,8 @@ public class MainActivity extends AppCompatActivity implements Asma2ElsewarAdapt
         //get text from searchEditText when click button
         String AyaWrittenInSearchBox = searchEditText.getText().toString();
         Context context = MainActivity.this;
-        Intent startChildActivityIntent = new Intent(context, Main2Activity.class);
-        startChildActivityIntent.putExtra(Intent.EXTRA_TEXT, AyaWrittenInSearchBox);
+        Intent startChildActivityIntent = new Intent(context, search_result.class);
+        startChildActivityIntent.putExtra("sTxt", AyaWrittenInSearchBox);
         startActivity(startChildActivityIntent);
     }
 }

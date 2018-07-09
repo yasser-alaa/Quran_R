@@ -21,6 +21,7 @@ import java.util.List;
 
 public class Main2Activity extends AppCompatActivity {
     private int suraNumber;
+    private int ayaNumServer;
     String mAyaSearched = "";
     private DataBaseHelper mDBHelper;
     private DataBaseHelper2 mDBHelper2;
@@ -53,17 +54,26 @@ public class Main2Activity extends AppCompatActivity {
         * 2- search for the sequence
         *       if detected in ayah then add this aya to the result list
         *       continue search till ayas end*/
-        if(intent.hasExtra(Intent.EXTRA_TEXT)){
-            mAyaSearched = intent.getStringExtra(Intent.EXTRA_TEXT);
-            for(Aya ayaTemp : ayas){
+
+        if(intent.hasExtra(getString(R.string.aya_returned)) &&
+                intent.hasExtra(getString(R.string.sura_returned))){
+            suraNumber = intent.getIntExtra(getString(R.string.sura_returned),2)-1;
+            ayaNumServer = intent.getIntExtra(getString(R.string.aya_returned),3);
+            String resultAya = mDBHelper.getaya(ayaNumServer,suraNumber+1);
+            Toast.makeText(this,resultAya + suraNumber+"  "+ayaNumServer,Toast.LENGTH_LONG).show();
+        }
+        if(intent.hasExtra("su")){
+            suraNumber = intent.getIntExtra("su",1)-1;
+
+            /*for(Aya ayaTemp : ayas){
                 if(ayaTemp.getAyahText().contains(mAyaSearched)){
                     resultAyas.add(ayaTemp.getAyahText());
                     suraNumber = mDBHelper.getSuraNumber(ayaTemp.getAyaNum());
                 }
-            }
+            }*/
         }
         else if(intent.hasExtra(Intent.EXTRA_INDEX)){
-            suraNumber = intent.getIntExtra(Intent.EXTRA_INDEX, 0);
+            suraNumber = intent.getIntExtra(Intent.EXTRA_INDEX, 1);
         }
 
         startPagePosition = suraList.get(suraNumber).getStartPage() - 1;

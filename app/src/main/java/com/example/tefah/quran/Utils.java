@@ -81,8 +81,8 @@ class Utils {
 
     public static void stopRecording(MediaRecorder recorder) {
         try {
-            recorder.stop();
-            recorder.release();
+          //  recorder.stop();
+            //recorder.release();
         }catch (IllegalStateException e){
             e.printStackTrace();
         }

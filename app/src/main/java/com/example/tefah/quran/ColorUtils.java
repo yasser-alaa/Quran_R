@@ -32,41 +32,41 @@ public class ColorUtils {
     public static int getViewHolderBackgroundColorFromInstance(Context context, int instanceNum) {
         switch (instanceNum) {
             case 0:
-                return ContextCompat.getColor(context, R.color.material50Green);
+                return ContextCompat.getColor(context, R.color.mushaf2);
             case 1:
-                return ContextCompat.getColor(context, R.color.material100Green);
+                return ContextCompat.getColor(context, R.color.mushaf3);
             case 2:
-                return ContextCompat.getColor(context, R.color.material150Green);
+                return ContextCompat.getColor(context, R.color.mushaf4);
             case 3:
-                return ContextCompat.getColor(context, R.color.material200Green);
+                return ContextCompat.getColor(context, R.color.mushaf5);
             case 4:
-                return ContextCompat.getColor(context, R.color.material250Green);
+                return ContextCompat.getColor(context, R.color.mushaf2);
             case 5:
-                return ContextCompat.getColor(context, R.color.material300Green);
+                return ContextCompat.getColor(context, R.color.mushaf3);
             case 6:
-                return ContextCompat.getColor(context, R.color.material350Green);
+                return ContextCompat.getColor(context, R.color.mushaf4);
             case 7:
-                return ContextCompat.getColor(context, R.color.material400Green);
+                return ContextCompat.getColor(context, R.color.mushaf5);
             case 8:
-                return ContextCompat.getColor(context, R.color.material450Green);
+                return ContextCompat.getColor(context, R.color.mushaf2);
             case 9:
-                return ContextCompat.getColor(context, R.color.material500Green);
+                return ContextCompat.getColor(context, R.color.mushaf3);
             case 10:
-                return ContextCompat.getColor(context, R.color.material550Green);
+                return ContextCompat.getColor(context, R.color.mushaf4);
             case 11:
-                return ContextCompat.getColor(context, R.color.material600Green);
+                return ContextCompat.getColor(context, R.color.mushaf5);
             case 12:
-                return ContextCompat.getColor(context, R.color.material650Green);
+                return ContextCompat.getColor(context, R.color.mushaf2);
             case 13:
-                return ContextCompat.getColor(context, R.color.material700Green);
+                return ContextCompat.getColor(context, R.color.mushaf3);
             case 14:
-                return ContextCompat.getColor(context, R.color.material750Green);
+                return ContextCompat.getColor(context, R.color.mushaf4);
             case 15:
-                return ContextCompat.getColor(context, R.color.material800Green);
+                return ContextCompat.getColor(context, R.color.mushaf5);
             case 16:
-                return ContextCompat.getColor(context, R.color.material850Green);
+                return ContextCompat.getColor(context, R.color.mushaf2);
             case 17:
-                return ContextCompat.getColor(context, R.color.material900Green);
+                return ContextCompat.getColor(context, R.color.mushaf3);
 
             default:
                 return Color.WHITE;
